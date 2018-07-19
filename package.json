@@ -1,0 +1,34 @@
+{
+  "name": "line-bot",
+  "version": "0.0.1",
+  "description": "this is a starter for line bot",
+  "private": true,
+  "scripts": {
+    "dev": "export `cat .line-env` && mono dev",
+    "start": "export `cat .line-env` && cross-env NODE_ENV=production mono",
+    "lint": "eslint src/ conf/ test/",
+    "test": "npm run lint && nyc ava --verbose --serial --fail-fast test/ && nyc report --reporter=html",
+    "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
+  },
+  "nyc": {
+    "include": [
+      "src/"
+    ]
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@line/bot-sdk": "^6.1.0",
+    "@terrajs/mono": "latest",
+    "cross-env": "^5.1.1",
+    "mono-doc": "latest"
+  },
+  "devDependencies": {
+    "ava": "^0.25.0",
+    "cachios": "^1.1.0",
+    "cheerio": "^1.0.0-rc.2",
+    "codecov": "^3.0.0",
+    "eslint": "^4.13.1",
+    "mono-test-utils": "^1.2.3",
+    "nyc": "^11.3.0"
+  }
+}
