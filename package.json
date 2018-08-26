@@ -20,7 +20,9 @@
     "@line/bot-sdk": "^6.1.0",
     "@terrajs/mono": "latest",
     "cross-env": "^5.1.1",
-    "mono-doc": "latest"
+    "firebase-admin": "^6.0.0",
+    "mono-doc": "latest",
+    "youtube-search": "^1.1.1"
   },
   "devDependencies": {
     "ava": "^0.25.0",

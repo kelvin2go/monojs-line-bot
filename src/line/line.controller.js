@@ -1,19 +1,28 @@
 "use strict";
 const line = require('@line/bot-sdk');
 const weather = require('../weather/weather.controller.js')
+const crypto = require('../lib/crypto.js')
+const youtube = require('../lib/youtube.js')
+const FIREBASE = require('../lib/firebase.js')
 
 // create LINE SDK config from env variables
 const config = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
   channelSecret: process.env.CHANNEL_SECRET,
 };
-console.log(config)
-console.log(process.env)
+// console.log(config)
+// console.log(process.env)
 // base URL for webhook server
 const baseURL = process.env.BASE_URL;
 
 // create LINE SDK client
 const client = new line.Client(config);
+const menu = {
+  start: ['開始'],
+  youtube: ['yt'],
+  crypto: ['cp'],
+  weather: ['天氣']
+}
 
 const LINE = {
   middleware: () => {
@@ -21,41 +30,132 @@ const LINE = {
   },
   // simple reply function
   replyText: (token, texts) => {
-    texts = Array.isArray(texts) ? texts : [texts];
+    let ntexts = Array.isArray(texts) ? texts : [texts];
     return client.replyMessage(
       token,
-      texts.map((text) => ({ type: 'text', text }))
+      ntexts.map((text) => ({ type: 'text', text }))
     );
+  },
+  replyCarousel: (token, keywords, images)  => {
+    let results = Array.isArray(images) ? images : [images];
+    const columns = results.map((img) => ({
+      thumbnailImageUrl: img.thumbnails.high.url.substring(0,1000),
+      title: img.title.substring(0,40),
+      text: img.channelTitle.substring(0,60),
+      actions: [
+        { label: 'Go Youtube', type: 'uri', uri: img.link },
+        { label: 'Detail', type: 'message', text: img.description.substring(0,300) }
+      ]
+    }))
+    return client.replyMessage(
+      token,
+      {
+        type: 'template',
+        altText: keywords,
+        template: {
+          type: 'carousel',
+          columns
+        }
+      })
   },
   handleText: async (message, replyToken, source) => {
     const buttonsImageURL = `${baseURL}/static/buttons/1040.jpg`;
-    switch (message.text) {
-      case 'weather': {
-        if (source.userId) {
-          const weatherInfo = await weather.getWeather()
-          const weatherStr = weather.toString(weatherInfo)
-          console.log(weatherStr)
-          return LINE.replyText(
-            replyToken,
-            [
-              `天氣注意:\n${weatherStr.warning}`,
-              `最近地震:\n${weatherStr.earthquake}`
-            ]
-          )
+    // const curProfile = await client.getProfile(source.userId)
+    const featureKey = message.text.trim().split(' ')
+    const key = featureKey[0]
+
+    let featureValue = [...featureKey]
+    featureValue.shift()
+    featureValue = featureValue.join(' ')
+    if (source.userId) {
+      client.getProfile(source.userId)
+      .then((profile) => {
+        FIREBASE.addUser(profile)
+      })
+    }
+    if (key === 'start' || menu.start.indexOf(key) > -1) {
+      if (source.userId) {
+        return LINE.replyText(
+          replyToken,
+          [
+            `選單: ${Object.keys(menu).map( (x) => {
+              return [x, ...menu[x]].join(' ') + '\n'
+            })} \n`
+          ]
+        )
+      } else {
+        return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
+      }   
+    }
+    if (key === 'youtube' || menu.youtube.indexOf(key) > -1) {
+      if (source.userId) {
+        let youtubeInfo = []
+        if (featureKey.length > 1 ) {
+          youtubeInfo = await youtube.search(featureValue)
         } else {
-          return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
+          youtubeInfo = await youtube.getTop5()
         }
+        // const youtubeStr = youtube.toString(youtubeInfo)
+        return LINE.replyCarousel(
+          replyToken, `${featureValue}`, youtubeInfo
+        )
+      } else {
+        return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
+      }   
+    }
+    if (key === 'crypto' || menu.crypto.indexOf(key) > -1 ) {
+      if (source.userId) {
+        let cryptoInfo = []
+        if (featureKey.length > 1 ) {
+          cryptoInfo = await crypto.getCrypto(featureValue)
+        } else {
+          cryptoInfo = await crypto.getTop10()
+        }
+        const cryptoStr = crypto.toString(cryptoInfo)
+        return LINE.replyText(
+          replyToken, 
+          [
+            `Crypto ${featureValue || `Top10`}:\n${cryptoStr}`
+          ]
+        )
+      } else {
+        return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
       }
+    }
+
+    if (key === 'weather') {
+      if (source.userId) {
+        const weatherInfo = await weather.getWeather()
+        const weatherStr = weather.toString(weatherInfo)
+        return LINE.replyText(
+          replyToken,
+          [
+            `天氣注意:\n${weatherStr.warning}`,
+            `最近地震:\n${weatherStr.earthquake}`
+          ]
+        )
+      } else {
+        return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
+      }
+    }
+
+    if (key === '')
+
+
+
+    switch (featureKey[0]) {
       case 'profile':
         if (source.userId) {
           return client.getProfile(source.userId)
-          .then((profile) => LINE.replyText(
-            replyToken,
-            [
-              `Display name: ${profile.displayName}`,
-              `Status message: ${profile.statusMessage}`,
-            ]
-          ));
+          .then((profile) => {
+            LINE.replyText(
+              replyToken,
+              [
+                `Display name: ${profile.displayName}`,
+                `Status message: ${profile.statusMessage}`,
+              ]
+            )
+          });
         } else {
           return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
         }
@@ -121,12 +221,12 @@ const LINE = {
                     { label: '言 hello2', type: 'postback', data: 'hello こんにちは', text: 'hello こんにちは' },
                     { label: 'Say message', type: 'message', text: 'Rice=米' },
                   ],
-                },
+                }
               ],
-            },
+            }
           }
         );
-      case 'image carousel':
+      case 'image_carousel':
         return client.replyMessage(
           replyToken,
           {
@@ -261,6 +361,18 @@ const LINE = {
         throw new Error(`Unknown event: ${JSON.stringify(event)}`);
       }
     }
+  },
+  pushMessage: (profile, texts) => {
+    texts = Array.isArray(texts) ? texts : [texts];
+    client.pushMessage(profile.userId, 
+      texts.map((text) => ({ type: 'text', text }))
+    )
+  },
+  multicast: (userIds, texts) => {
+    texts = Array.isArray(texts) ? texts : [texts];
+    client.multicast(userIds, 
+      texts.map((text) => ({ type: 'text', text }))
+    )
   }
 }
 

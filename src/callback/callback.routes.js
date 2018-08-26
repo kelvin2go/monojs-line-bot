@@ -1,12 +1,10 @@
-const line = require('./line.controller.js')
-
+const line = require('../line/line.controller.js')
 
 module.exports = [
 	{
 		method: ['POST', 'GET'],
 		path: '/callback',
 		handler: [
-      // line.middleware(),
       async (req, res) => {
         Promise
         .all(req.body.events.map(line.handleEvent))
@@ -15,6 +13,6 @@ module.exports = [
           console.error(err);
           res.status(500).end();
         });
-		}]
-	}
+    }]
+  }
 ]

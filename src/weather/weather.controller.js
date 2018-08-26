@@ -9,10 +9,10 @@ const API = {
 const WEATHER = {
   toString: (weather) => {
     const warning = weather.warning.map( x => {
-      return `${x.time}: ${x.key}\n`
+      return `\n${x.time}: ${x.key}`
     })
     const earthquake = weather.earthquake.map( x => {
-      return `${x.time}: 震度 ${x.rate} 深 ${x.deep}km 位於 ${x.location}\n`
+      return `\n${x.time}: 震度 ${x.rate} 深 ${x.deep}km 位於 ${x.location}`
     })
     return { warning, earthquake}
   },

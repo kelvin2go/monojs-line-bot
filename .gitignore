@@ -16,3 +16,4 @@ coverage
 .DS_Store
 
 .line-env
+.fb_key.json
