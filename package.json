@@ -22,6 +22,8 @@
   "dependencies": {
     "@line/bot-sdk": "^6.1.0",
     "@terrajs/mono": "latest",
+    "cachios": "^1.1.0",
+    "cheerio": "^1.0.0-rc.2",
     "cross-env": "^5.1.1",
     "firebase-admin": "^6.0.0",
     "mono-doc": "latest",
@@ -29,8 +31,6 @@
   },
   "devDependencies": {
     "ava": "^0.25.0",
-    "cachios": "^1.1.0",
-    "cheerio": "^1.0.0-rc.2",
     "codecov": "^3.0.0",
     "eslint": "^4.13.1",
     "mono-test-utils": "^1.2.3",
