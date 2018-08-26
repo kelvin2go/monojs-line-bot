@@ -11,7 +11,8 @@ module.exports = {
 		],
 		// See https://terrajs.org/mono/configuration/http
 		http: {
-			port: process.env.PORT || 8000
+			port: process.env.PORT || 8000,
+			logLevel: 'combined'
 		},
 		// See https://terrajs.org/mono/configuration/log
 		log: {
