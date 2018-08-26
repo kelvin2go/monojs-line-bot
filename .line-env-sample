@@ -1,3 +1,4 @@
+NODE_ENV=development
 CHANNEL_ACCESS_TOKEN={accessTOKEN}
 CHANNEL_SECRET={secret}
 YOUTUBE_KEY={youtubeKeyV3}

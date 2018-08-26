@@ -1,9 +1,20 @@
 'use-strict';
 const admin = require('firebase-admin')
 
-admin.initializeApp({
-  credential: admin.credential.cert(process.env.GOOGLE_APPLICATION_CREDENTIALS)
-})
+let serviceAccount = process.env.GOOGLE_APPLICATION_CREDENTIALS
+
+if (process.env.NODE_ENV === "development") {
+  serviceAccount = require('../../.fb_key.json')
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: 'https://kelvinho-bb7a9.firebaseio.com'
+  })
+} else {
+  admin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(serviceAccount)),
+    databaseURL: 'https://kelvinho-bb7a9.firebaseio.com'
+  })
+}
 const settings = {
   timestampsInSnapshots: true
 }
