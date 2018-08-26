@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "export GOOGLE_APPLICATION_CREDENTIALS=\"./.fb_key.json\" && export `cat .line-env` && mono dev",
-    "start": "export `cat .line-env` && cross-env NODE_ENV=production mono",
+    "start": "cross-env NODE_ENV=production mono",
     "lint": "eslint src/ conf/ test/",
     "test": "npm run lint && nyc ava --verbose --serial --fail-fast test/ && nyc report --reporter=html",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
