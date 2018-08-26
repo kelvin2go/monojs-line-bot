@@ -1,9 +1,8 @@
 'use-strict';
 const admin = require('firebase-admin')
-const serviceAccount = require('../../.fb_key.json') // {path/to/serviceAccountKey.json}
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(process.env.GOOGLE_APPLICATION_CREDENTIALS)
 })
 const settings = {
   timestampsInSnapshots: true
