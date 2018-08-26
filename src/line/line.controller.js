@@ -14,14 +14,15 @@ const config = {
 // console.log(process.env)
 // base URL for webhook server
 const baseURL = process.env.BASE_URL;
-
+var usersList = [];
 // create LINE SDK client
 const client = new line.Client(config);
 const menu = {
-  start: ['開始'],
+  start: ['開始', 'hi', 'hello'],
   youtube: ['yt'],
   crypto: ['cp'],
-  weather: ['天氣']
+  weather: ['天氣'],
+  qrcode: ['qr', 'share bot']
 }
 
 const LINE = {
@@ -62,7 +63,7 @@ const LINE = {
     const buttonsImageURL = `${baseURL}/static/buttons/1040.jpg`;
     // const curProfile = await client.getProfile(source.userId)
     const featureKey = message.text.trim().split(' ')
-    const key = featureKey[0]
+    const key = featureKey[0].toLowerCase()
 
     let featureValue = [...featureKey]
     featureValue.shift()
@@ -71,21 +72,30 @@ const LINE = {
       client.getProfile(source.userId)
       .then((profile) => {
         FIREBASE.addUser(profile)
+        usersList = {
+          ...usersList,
+          [source.userId]: profile
+        }
       })
     }
     if (key === 'start' || menu.start.indexOf(key) > -1) {
       if (source.userId) {
+        let greeting = ''
+        if (source.userId in usersList) {
+          greeting = `您好： ${usersList[source.userId].displayName}\n`
+        }
+
         return LINE.replyText(
           replyToken,
           [
-            `選單: ${Object.keys(menu).map( (x) => {
-              return [x, ...menu[x]].join(' ') + '\n'
+            `${greeting} 選單: ${Object.keys(menu).map( (x) => {
+              return '\n'+[x, ...menu[x]].join(', ')
             })} \n`
           ]
         )
       } else {
         return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
-      }   
+      }
     }
     if (key === 'youtube' || menu.youtube.indexOf(key) > -1) {
       if (source.userId) {
@@ -139,8 +149,23 @@ const LINE = {
       }
     }
 
-    if (key === '')
-
+    if (key === 'qrcode' || menu.qrcode.indexOf(key) > -1) {
+      if (source.userId) {
+        return client.replyMessage(
+          replyToken,
+          {
+            type: 'imagemap',
+            baseUrl: `${baseURL}/static/bot-qr.png`,
+            altText: 'QRcode ',
+            baseSize: { width: 180, height: 180 },
+            actions: [
+            ],
+          }
+        );
+      } else {
+        return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
+      }
+    }
 
 
     switch (featureKey[0]) {
