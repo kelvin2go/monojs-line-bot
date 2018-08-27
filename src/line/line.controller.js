@@ -76,6 +76,7 @@ const LINE = {
           ...usersList,
           [source.userId]: profile
         }
+        console.log(usersList)
       })
     }
     if (key === 'start' || menu.start.indexOf(key) > -1) {
