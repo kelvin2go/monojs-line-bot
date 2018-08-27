@@ -9,22 +9,6 @@ const OPTIONS = {
 }
 
 const YOUTUBE = {
-  toString: (results) => {
-    let msg = Object.keys(results).map( (key) => {
-      const x = results[key]
-      let result = `\n${x.title}: `
-      if ('link' in x) {
-        result += ` \n${x.link}`
-      }
-      console.dir(x.thumbnails)
-      if ('thumbnails' in x) {
-        console.dir(x.thumbnails)
-      }
-      return result
-    })
-    console.log(msg)
-    return msg
-  },
   search: async (title) => {
     let result = await ytsearch(title, OPTIONS)
     return result.results
