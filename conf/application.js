@@ -7,7 +7,7 @@ module.exports = {
 	mono: {
 		// See https://terrajs.org/mono/configuration/modules
 		modules: [
-			'mono-doc'
+			'mono-doc',
 		],
 		// See https://terrajs.org/mono/configuration/http
 		http: {

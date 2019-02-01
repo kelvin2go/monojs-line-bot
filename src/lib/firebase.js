@@ -1,4 +1,3 @@
-'use-strict';
 const admin = require('firebase-admin')
 
 let serviceAccount = process.env.GOOGLE_APPLICATION_CREDENTIALS
@@ -28,7 +27,7 @@ const FIREBASE = {
     return await usersCollectionRef.get()
   },
   getUser: async (userid) => {
-    if (!userid) return 
+    if (!userid) return
     return await usersCollectionRef.doc(userid).get()
   },
   updateUser: async (userid) => {

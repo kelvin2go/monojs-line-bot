@@ -1,13 +1,10 @@
 {
-  "name": "line-bot",
+  "name": "monojs-line-bot",
   "version": "0.0.1",
-  "description": "this is a starter for line bot",
+  "description": "Monojs with line bot",
   "private": true,
-  "engines": {
-    "node": "10.x"
-  },
   "scripts": {
-    "dev": "export `cat .line-env` && mono dev",
+    "dev": "export `cat ./.line-env` && mono dev",
     "start": "cross-env NODE_ENV=production mono",
     "lint": "eslint src/ conf/ test/",
     "test": "npm run lint && nyc ava --verbose --serial --fail-fast test/ && nyc report --reporter=html",
@@ -21,13 +18,17 @@
   "license": "MIT",
   "dependencies": {
     "@line/bot-sdk": "^6.1.0",
-    "@terrajs/mono": "latest",
     "cachios": "^1.1.0",
     "cheerio": "^1.0.0-rc.2",
     "cross-env": "^5.1.1",
     "firebase-admin": "^6.0.0",
+    "fuse.js": "^3.3.0",
+    "lodash": "^4.17.11",
+    "mongodb-utils": "latest",
+    "mono-core": "latest",
     "mono-doc": "latest",
-    "youtube-search": "^1.1.1"
+    "mono-mongodb": "latest",
+    "youtube-search": "^1.1.4"
   },
   "devDependencies": {
     "ava": "^0.25.0",

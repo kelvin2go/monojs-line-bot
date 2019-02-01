@@ -1,6 +1,6 @@
-# line-bot
+# monojs-line-bot
 
-this is a starter for line bot
+Monojs with line bot
 
 ## Installation
 
