@@ -192,7 +192,7 @@ const EventHandler = {
               },
               {
                 "type": "text",
-                "text": `查團 ${orderId}`
+                "text": `團號 ${orderId}`
               }
             ]
           )
@@ -357,13 +357,18 @@ const LINE = {
               })
             }
             const groupInfo = isOwner ? convertOrderInfo(allOrders) : convertOrderInfo(allOrders.filter(x => x.user === userId))
-            const groupContainer = {
-              "type": "box",
-              "layout": "vertical",
-              "margin": "xxl",
-              "spacing": "sm",
-              "contents": groupInfo
-            }
+            const groupContainer = groupInfo.length > 0 ?
+              {
+                "type": "box",
+                "layout": "vertical",
+                "margin": "xxl",
+                "spacing": "sm",
+                "contents": groupInfo
+              } : {
+                "type": "text",
+                "text": `無人下單`,
+                "size": "sm"
+              }
             return client.replyMessage(
               replyToken,
               {
@@ -499,11 +504,10 @@ const LINE = {
           }
         } else {
           console.log(`Too low confidence ${firstElement.confidence}`)
-
           return LINE.replyText(
             replyToken,
             [
-              `你是在說 "${firstElement.value}" 相關的嗎？\n (guess rate: ${firstElement.confidence * 100}%)`
+              `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`
             ]
           )
         }
@@ -820,10 +824,10 @@ const LINE = {
       const drinks = await DRINK.searchDrink(resturant.index, intent.value)
       const pendingOrder = DRINK.hasPendingOrder(userId)
       let pendingMsg = {}
-      if (pendingOrder) {
-        const pendingOrderObject = await DRINK.getOrder(pendingOrder)
+      if (pendingOrder && pendingOrder[0]) {
+        const pendingOrderObject = await DRINK.getOrder(pendingOrder[0])
         if (pendingOrderObject) {
-          if (pendingOrderObject.restaurant_index !== resturant.index) {
+          if (pendingOrderObject.fields.restaurant_index !== resturant.id) {
             pendingMsg = {
               type: 'text', text: `找到的 飲料 跟 開團的不一樣哦! 請確定這家有 '${intent.value}'`
             }
@@ -843,7 +847,7 @@ const LINE = {
             "action": {
               "type": "postback",
               "label": `中 $${x.fields.medium} `,
-              "data": `setDrinkOrder = start & orderId=${pendingOrder[0]}& drink=${x.fields.Name}& size=medium & price=${x.fields.medium} `
+              "data": `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=medium&price=${x.fields.medium}`
             }
           }
           : null
@@ -856,7 +860,7 @@ const LINE = {
             "action": {
               "type": "postback",
               "label": `大 $${x.fields.large} `,
-              "data": `setDrinkOrder = start & orderId=${pendingOrder[0]}& drink=${x.fields.Name}& size=large & price=${x.fields.large} `
+              "data": `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=large&price=${x.fields.large}`
             }
           }
           : null
@@ -868,7 +872,7 @@ const LINE = {
       return client.replyMessage(
         replyToken,
         [
-          drinks.slice(0, 3).map((x, index) => {
+          ...drinks.slice(0, 3).map((x, index) => {
             return LINE.wrapDrink(resturant, x, drinkButtons[index])
           }).reverse(),
           pendingMsg
@@ -948,14 +952,62 @@ const LINE = {
         return client.replyMessage(
           replyToken,
           {
-            type: 'imagemap',
-            baseUrl: `${baseURL}/static/bot-qr.png`,
-            altText: 'QRcode ',
-            baseSize: { width: 180, height: 180 },
-            actions: [
-            ],
+            "type": "flex",
+            "altText": "QR share bot",
+            "contents": {
+              "type": "bubble",
+              "body": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "contents": [{
+                  "type": "box",
+                  "layout": "vertical",
+                  "margin": "xxl",
+                  "contents": [
+                    {
+                      "type": "spacer"
+                    },
+                    {
+                      "type": "image",
+                      "url": `${baseURL}/static/din.png`,
+                      "aspectMode": "cover",
+                      "size": "xl"
+                    },
+                    {
+                      "type": "text",
+                      "text": "You can share this Qrcode for adding this bot",
+                      "color": "#aaaaaa",
+                      "wrap": true,
+                      "margin": "xxl",
+                      "size": "xs"
+                    }
+                  ]
+                }]
+              },
+              "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "spacer",
+                    "size": "xxl"
+                  },
+                  {
+                    "type": "button",
+                    "style": "primary",
+                    "color": "#905c44",
+                    "action": {
+                      "type": "uri",
+                      "label": "Github",
+                      "uri": "https://github.com/kelvin2go/monojs-line-bot"
+                    }
+                  }
+                ]
+              }
+            }
           }
-        );
+        )
       } else {
         return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
       }

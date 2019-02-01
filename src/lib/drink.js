@@ -47,7 +47,6 @@ const DRINK = {
     let list = DRINK.resturantList
     if (list.length <= 0) {
       list = await DRINK.getIndex()
-      list = list.records
     }
     console.log(`Search resturant ${text}`)
     // console.log(list)
