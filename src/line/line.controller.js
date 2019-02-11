@@ -524,203 +524,195 @@ const LINE = {
     if (intent.key === 'menu' || intent.key === 'greetings') {
       return client.replyMessage(
         replyToken,
-        client.replyMessage(
-          replyToken,
-          {
-            "type": "flex",
-            "altText": "menu",
-            "contents": {
-              "type": "bubble",
-              "body": {
-                "type": "box",
-                "layout": "vertical",
-                "spacing": "md",
-                "contents": [
-                  {
-                    "type": "text",
-                    "text": "我的功能單 ：",
-                    "size": "xl",
-                    "weight": "bold"
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "spacing": "sm",
-                    "contents": [
-                      {
-                        "type": "box",
-                        "layout": "baseline",
-                        "spacing": "sm",
-                        "contents": [
-                          {
-                            "type": "text",
-                            "text": "Youtube",
-                            "color": "#aaaaaa",
-                            "size": "sm",
-                            "flex": 2
-                          },
-                          {
-                            "type": "text",
-                            "text": "youtube burno mars, yt 周杰倫",
-                            "wrap": true,
-                            "color": "#666666",
-                            "size": "sm",
-                            "flex": 5
-                          }
-                        ]
-                      },
-                      {
-                        "type": "box",
-                        "layout": "baseline",
-                        "spacing": "sm",
-                        "contents": [
-                          {
-                            "type": "text",
-                            "text": "天氣",
-                            "color": "#aaaaaa",
-                            "size": "sm",
-                            "flex": 2
-                          },
-                          {
-                            "type": "text",
-                            "text": "天氣, 地震, weather ",
-                            "wrap": true,
-                            "color": "#666666",
-                            "size": "sm",
-                            "flex": 5
-                          }
-                        ]
-                      },
-                      {
-                        "type": "box",
-                        "layout": "baseline",
-                        "spacing": "sm",
-                        "contents": [
-                          {
-                            "type": "text",
-                            "text": "Crypto",
-                            "color": "#aaaaaa",
-                            "size": "sm",
-                            "flex": 2
-                          },
-                          {
-                            "type": "text",
-                            "text": "crypto, crypto BTC, 加密 ETH",
-                            "wrap": true,
-                            "color": "#666666",
-                            "size": "sm",
-                            "flex": 5
-                          }
-                        ]
-                      },
-                      {
-                        "type": "box",
-                        "layout": "baseline",
-                        "spacing": "sm",
-                        "contents": [
-                          {
-                            "type": "text",
-                            "text": "訂飲料",
-                            "color": "#aaaaaa",
-                            "size": "sm",
-                            "flex": 2
-                          },
-                          {
-                            "type": "text",
-                            "text": "開團, 迷克夏, 團號 XXXX",
-                            "wrap": true,
-                            "color": "#666666",
-                            "size": "sm",
-                            "flex": 5
-                          }
-                        ]
-                      }
-                    ]
+        {
+          "type": "flex",
+          "altText": "menu",
+          "contents": {
+            "type": "bubble",
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "md",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "我的功能單 ：",
+                  "size": "xl",
+                  "weight": "bold"
+                },
+                {
+                  "type": "box",
+                  "layout": "vertical",
+                  "spacing": "sm",
+                  "contents": [
+                    {
+                      "type": "box",
+                      "layout": "baseline",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": "Youtube",
+                          "color": "#aaaaaa",
+                          "size": "sm",
+                          "flex": 2
+                        },
+                        {
+                          "type": "text",
+                          "text": "youtube burno mars, yt 周杰倫",
+                          "wrap": true,
+                          "color": "#666666",
+                          "size": "sm",
+                          "flex": 5
+                        }
+                      ]
+                    },
+                    {
+                      "type": "box",
+                      "layout": "baseline",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": "天氣",
+                          "color": "#aaaaaa",
+                          "size": "sm",
+                          "flex": 2
+                        },
+                        {
+                          "type": "text",
+                          "text": "天氣, 地震, weather ",
+                          "wrap": true,
+                          "color": "#666666",
+                          "size": "sm",
+                          "flex": 5
+                        }
+                      ]
+                    },
+                    {
+                      "type": "box",
+                      "layout": "baseline",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": "Crypto",
+                          "color": "#aaaaaa",
+                          "size": "sm",
+                          "flex": 2
+                        },
+                        {
+                          "type": "text",
+                          "text": "crypto, crypto BTC, 加密 ETH",
+                          "wrap": true,
+                          "color": "#666666",
+                          "size": "sm",
+                          "flex": 5
+                        }
+                      ]
+                    },
+                    {
+                      "type": "box",
+                      "layout": "baseline",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": "訂飲料",
+                          "color": "#aaaaaa",
+                          "size": "sm",
+                          "flex": 2
+                        },
+                        {
+                          "type": "text",
+                          "text": "開團, 迷克夏, 團號 XXXX",
+                          "wrap": true,
+                          "color": "#666666",
+                          "size": "sm",
+                          "flex": 5
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "footer": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "button",
+                  "style": "link",
+                  "color": "#ff0100",
+                  "height": "sm",
+                  "action": {
+                    "type": "message",
+                    "label": "youtube 周杰倫",
+                    "text": "youtube 周杰倫"
                   }
-                ]
-              },
-              "footer": {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                  {
-                    "type": "button",
-                    "style": "link",
-                    "height": "sm",
-                    "action": {
-                      "type": "message",
-                      "label": "youtube 周杰倫",
-                      "color": "#c1f0f0",
-                      "text": "youtube 周杰倫"
-                    }
-                  },
-                  {
-                    "type": "button",
-                    "style": "link",
-                    "height": "sm",
-                    "action": {
-                      "type": "message",
-                      "label": "天氣",
-                      "color": "#c1f0f0",
-                      "text": "天氣"
-                    }
-                  },
-                  {
-                    "type": "button",
-                    "style": "link",
-                    "height": "sm",
-                    "action": {
-                      "type": "message",
-                      "label": "crypto currency",
-                      "color": "#c1f0f0",
-                      "text": "crypto"
-                    }
-                  },
-
-                  {
-                    "type": "button",
-                    "style": "primary",
-                    "color": "#F5CC4F",
-                    "height": "sm",
-                    "action": {
-                      "type": "message",
-                      "label": "把·開din·傳出去！",
-                      "text": "share"
-                    }
-                    // },
-                    // {
-                    //   "type": "button",
-                    //   "style": "primary",
-                    //   "action": {
-                    //     "type": "message",
-                    //     "label": "開團",
-                    //     "text": "開團"
-                    //   }
-                  },
-                  {
-                    "type": "button",
-                    "style": "primary",
-                    "action": {
-                      "type": "message",
-                      "label": "迷克夏",
-                      "text": "迷克夏"
-                    }
-                  },
-                  {
-                    "type": "button",
-                    "style": "link",
-                    "action": {
-                      "type": "postback",
-                      "color": "#c1f0f0",
-                      "label": "所有飲料店",
-                      "data": "allResturant=true"
-                    }
-                  },
-                ]
-              }
+                },
+                {
+                  "type": "button",
+                  "style": "link",
+                  "height": "sm",
+                  "action": {
+                    "type": "message",
+                    "label": "天氣",
+                    "text": "天氣"
+                  }
+                },
+                {
+                  "type": "button",
+                  "style": "link",
+                  "height": "sm",
+                  "action": {
+                    "type": "message",
+                    "label": "crypto currency",
+                    "text": "crypto"
+                  }
+                },
+                {
+                  "type": "button",
+                  "style": "primary",
+                  "color": "#F5CC4F",
+                  "action": {
+                    "type": "message",
+                    "label": "把·開din·傳出去！",
+                    "text": "share"
+                  }
+                  // },
+                  // {
+                  //   "type": "button",
+                  //   "style": "primary",
+                  //   "action": {
+                  //     "type": "message",
+                  //     "label": "開團",
+                  //     "text": "開團"
+                  //   }
+                },
+                {
+                  "type": "button",
+                  "style": "link",
+                  "action": {
+                    "type": "message",
+                    "label": "迷克夏",
+                    "text": "迷克夏"
+                  }
+                },
+                {
+                  "type": "button",
+                  "style": "primary",
+                  "action": {
+                    "type": "postback",
+                    "label": "所有飲料店",
+                    "data": "allResturant=true"
+                  }
+                }
+              ]
             }
           }
-        )
+        }
       )
     }
 
