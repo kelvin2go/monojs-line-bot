@@ -513,7 +513,6 @@ const LINE = {
         }
       }
     }
-    console.log(intent)
     if (intent.key === 'menu' || intent.key === 'greetings') {
       return client.replyMessage(
         replyToken,
@@ -661,9 +660,9 @@ const LINE = {
                     "style": "link",
                     "height": "sm",
                     "action": {
-                      "type": "postback",
-                      "label": "飲料店",
-                      "data": "allResturant=true"
+                      "type": "message",
+                      "label": "crypto currency",
+                      "text": "crypto btc"
                     }
                   },
                   {
@@ -671,18 +670,38 @@ const LINE = {
                     "style": "link",
                     "height": "sm",
                     "action": {
-                      "type": "message",
-                      "label": "迷克夏",
-                      "text": "迷克夏"
+                      "type": "postback",
+                      "label": "飲料店",
+                      "data": "allResturant=true"
                     }
                   },
                   {
                     "type": "button",
                     "style": "primary",
+                    "color": "#F5CC4F",
                     "action": {
                       "type": "message",
-                      "label": "開團",
-                      "text": "開團"
+                      "label": "把·開din·傳出去！",
+                      "text": "share"
+                    }
+                    // },
+                    // {
+                    //   "type": "button",
+                    //   "style": "primary",
+                    //   "action": {
+                    //     "type": "message",
+                    //     "label": "開團",
+                    //     "text": "開團"
+                    //   }
+                  },
+                  {
+                    "type": "button",
+                    "style": "primary",
+                    "height": "sm",
+                    "action": {
+                      "type": "message",
+                      "label": "迷克夏",
+                      "text": "迷克夏"
                     }
                   }
                 ]
@@ -836,7 +855,7 @@ const LINE = {
       } else {
         pendingMsg = { type: 'text', text: "可是你還沒開團/跟團" }
       }
-      console.log(pendingOrder)
+      // console.log(pendingOrder)
       const drinkButtons = drinks.slice(0, 3).map((x, index) => {
         const result = []
         const medium = x.fields.medium ?
@@ -882,7 +901,7 @@ const LINE = {
 
 
     // other utils
-    if (intent.key === 'youtube' || key === 'youtube' || menu.youtube.indexOf(key) > -1) {
+    if ((intent.key === 'bot_feature' && intent.value === 'youtube') || intent.key === 'youtube' || key === 'youtube' || menu.youtube.indexOf(key) > -1) {
       if (source.userId) {
         let youtubeInfo = []
         if (featureKey.length > 1) {
@@ -898,7 +917,7 @@ const LINE = {
         return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
       }
     }
-    if (intent.key === 'crypto' || key === 'crypto' || menu.crypto.indexOf(key) > -1) {
+    if ((intent.key === 'bot_feature' && intent.value === 'crypto') || intent.key === 'crypto' || key === 'crypto' || menu.crypto.indexOf(key) > -1) {
       if (source.userId) {
         let cryptoInfo = []
         if (featureKey.length > 1) {
@@ -931,7 +950,7 @@ const LINE = {
       }
     }
 
-    if (intent.key === 'weather' || intent.key === 'earthquake' || key === 'weather') {
+    if ((intent.key === 'bot_feature' && intent.value === 'weather') || intent.key === 'weather' || intent.key === 'earthquake' || key === 'weather') {
       if (source.userId) {
         const weatherInfo = await weather.getWeather()
         const weatherStr = weather.toString(weatherInfo)
@@ -947,60 +966,104 @@ const LINE = {
       }
     }
 
-    if (intent.key === 'qrcode' || key === 'qrcode' || menu.qrcode.indexOf(key) > -1) {
+    if ((intent.key === 'bot_feature' && intent.value === 'qrcode') || intent.key === 'qrcode' || key === 'qrcode' || menu.qrcode.indexOf(key) > -1) {
       if (source.userId) {
         return client.replyMessage(
           replyToken,
           {
             "type": "flex",
-            "altText": "QR share bot",
+            "altText": "menu",
             "contents": {
               "type": "bubble",
               "body": {
                 "type": "box",
                 "layout": "vertical",
                 "spacing": "md",
-                "contents": [{
-                  "type": "box",
-                  "layout": "vertical",
-                  "margin": "xxl",
-                  "contents": [
-                    {
-                      "type": "spacer"
-                    },
-                    {
-                      "type": "image",
-                      "url": `${baseURL}/static/din.png`,
-                      "aspectMode": "cover",
-                      "size": "xl"
-                    },
-                    {
-                      "type": "text",
-                      "text": "You can share this Qrcode for adding this bot",
-                      "color": "#aaaaaa",
-                      "wrap": true,
-                      "margin": "xxl",
-                      "size": "xs"
-                    }
-                  ]
-                }]
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "開DIN 開團訂飲料 聊天機械人",
+                    "wrap": true,
+                    "weight": "bold",
+                    "gravity": "center",
+                    "size": "xl"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "lg",
+                    "spacing": "sm",
+                    "contents": [
+                      {
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                          {
+                            "type": "text",
+                            "text": "感謝你 分享 share - 開DIN BOT",
+                            "wrap": true
+                          }
+                        ]
+                      },
+                      {
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                          {
+                            "type": "text",
+                            "text": "如想加入更多功能 / 反饋問題，請用GITHUB",
+                            "wrap": true
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "xxl",
+                    "contents": [
+                      {
+                        "type": "spacer"
+                      },
+                      {
+                        "type": "image",
+                        "url": `${baseURL}/static/din.png`,
+                        "aspectMode": "cover",
+                        "size": "xl"
+                      },
+                      {
+                        "type": "text",
+                        "text": "You can share this Qrcode for adding this bot",
+                        "color": "#aaaaaa",
+                        "wrap": true,
+                        "margin": "xxl",
+                        "size": "xs"
+                      }
+                    ]
+                  }
+                ]
               },
               "footer": {
                 "type": "box",
                 "layout": "vertical",
+                "spacing": "sm",
                 "contents": [
                   {
-                    "type": "spacer",
-                    "size": "xxl"
-                  },
-                  {
                     "type": "button",
-                    "style": "primary",
-                    "color": "#905c44",
                     "action": {
                       "type": "uri",
                       "label": "Github",
                       "uri": "https://github.com/kelvin2go/monojs-line-bot"
+                    }
+                  }, {
+                    "type": "button",
+                    "action": {
+                      "type": "uri",
+                      "label": "開發者網頁",
+                      "uri": "https://kelvinho.js.org"
                     }
                   }
                 ]
