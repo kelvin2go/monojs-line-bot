@@ -102,6 +102,11 @@ const DRINK = {
     return false
   },
   addUser: async (userId) => {
+    let foundUser = null
+    if (userId) {
+      foundUser = await DRINK.getUser(userId)
+    }
+    if (foundUser) return // already added
     const profile = await LINEClient.getProfile(userId)
     const fields = {
       userId: profile.userId,

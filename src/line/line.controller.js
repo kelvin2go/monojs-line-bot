@@ -5,8 +5,9 @@ const CRYPTO = require('../lib/crypto.js')
 const YOUTUBE = require('../lib/youtube.js')
 const DRINK = require('../lib/drink.js')
 const WITAI = require('../lib/witai.js')
-const FIREBASE = require('../lib/firebase.js')
+// const FIREBASE = require('../lib/firebase.js')
 
+const _orderBy = require('lodash/orderBy')
 Date.prototype.yyyymmdd = function () {
   const mm = this.getMonth() + 1
   const dd = this.getDate()
@@ -191,7 +192,7 @@ const EventHandler = {
         const orderId = actionMap['orderId']
         if (orderId && orderId !== 'undefined') {
           console.log("start sending order")
-          // `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=large`
+          // `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=large&resutrant=id`
           await DRINK.sendOrder(userId, orderId, {
             drink: actionMap['drink'],
             size: actionMap['size'],
@@ -217,7 +218,83 @@ const EventHandler = {
             ]
           )
         } else { // ask for 開團
+          const resturant = await DRINK.resturantSearch(actionMap['resturant'])
+          return client.replyMessage(
+            replyToken,
+            [
+              {
+                "type": "flex",
+                "altText": `${resturant.name} info card`,
+                "contents": {
+                  "type": "bubble",
+                  "hero": {
+                    "type": "image",
+                    "url": resturant.image.logo.url,
+                    "size": "full",
+                  },
+                  "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": resturant.intro,
+                        "wrap": true,
+                        "color": "#666666",
+                      }
+                    ]
+                  },
+                  "footer": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": [
+                      {
+                        "type": "button",
+                        "style": "link",
+                        "height": "sm",
+                        "action": {
+                          "type": "postback",
+                          "label": "飲品價目表",
+                          "data": `drinkMenu=${resturant.name}`
+                        }
+                      },
+                      {
+                        "type": "button",
+                        "style": "link",
+                        "height": "sm",
+                        "action": {
+                          "type": "postback",
+                          "label": "開團",
+                          "data": `startDrinkOrder=${resturant.name}`
+                        }
+                      },
+                      {
+                        "type": "button",
+                        "style": "link",
+                        "height": "sm",
+                        "action": {
+                          "type": "uri",
+                          "label": "官網",
+                          "uri": resturant.url
+                        }
+                      },
+                      {
+                        "type": "spacer",
+                        "size": "sm"
+                      }
+                    ],
+                    "flex": 0
+                  }
+                }
+              },
+              {
+                "type": "text",
+                "text": `你要開團嗎？（如要請點）`
+              },
+            ]
 
+          )
 
         }
 
@@ -237,11 +314,13 @@ const LINE = {
     if (userId) {
       profile = await client.getProfile(userId)
       if (profile) {
-        FIREBASE.addUser(profile)
+        // FIREBASE.addUser(profile)
+        DRINK.addUser(userId)
         usersList = {
           ...usersList,
           [userId]: profile
         }
+
       }
     }
     return profile
@@ -502,7 +581,10 @@ const LINE = {
 
     // WIT
     if (witIntent.hasOwnProperty('entities')) {
-      const firstKey = Object.keys(witIntent.entities)[0]
+      const sortedEntities = Object.keys(witIntent.entities).sort((a, b) => {
+        return witIntent.entities[b][0].confidence - witIntent.entities[a][0].confidence
+      })
+      const firstKey = sortedEntities[0]
       const firstElement = witIntent.entities[firstKey][0]
       if (firstElement.hasOwnProperty('confidence')) {
         if (firstElement.confidence * 100 > 90) {
@@ -512,10 +594,25 @@ const LINE = {
           }
         } else {
           console.log(`Too low confidence ${firstElement.confidence}`)
-          return LINE.replyText(
+          return client.replyMessage(
             replyToken,
             [
-              `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`
+              {
+                "type": "text",
+                "text": `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
+              },
+              {
+                type: 'template',
+                altText: 'correcting words',
+                template: {
+                  type: 'confirm',
+                  text: `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
+                  actions: [
+                    { label: 'Yes', type: 'message', text: `是! ${firstElement.value}` },
+                    { label: 'No', type: 'message', text: `否! ${firstElement.value}` },
+                  ],
+                },
+              }
             ]
           )
         }
@@ -722,7 +819,8 @@ const LINE = {
     if (source.userId) {
       client.getProfile(userId)
         .then((profile) => {
-          FIREBASE.addUser(profile)
+          // FIREBASE.addUser(profile)
+          DRINK.addUser(userId)
           usersList = {
             ...usersList,
             [source.userId]: profile
@@ -873,7 +971,7 @@ const LINE = {
             "action": {
               "type": "postback",
               "label": `中 $${x.fields.medium} `,
-              "data": `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=medium&price=${x.fields.medium}`
+              "data": `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=medium&price=${x.fields.medium}&resturant=${resturant.index}`
             }
           }
           : null
@@ -886,7 +984,7 @@ const LINE = {
             "action": {
               "type": "postback",
               "label": `大 $${x.fields.large} `,
-              "data": `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=large&price=${x.fields.large}`
+              "data": `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=large&price=${x.fields.large}&resturant=${resturant.index}`
             }
           }
           : null

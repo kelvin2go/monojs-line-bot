@@ -4,7 +4,8 @@ const API_URL = `https://api.wit.ai`
 const config = {
   headers: {
     Authorization: `Bearer ${process.env.WIT_AI_TOKEN}`
-  }
+  },
+  ttl: 3
 }
 
 const WITAI = {
