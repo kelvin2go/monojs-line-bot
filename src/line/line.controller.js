@@ -646,10 +646,10 @@ const LINE = {
                     "type": "button",
                     "style": "link",
                     "height": "sm",
-                    "color": "#0099ff",
                     "action": {
                       "type": "message",
                       "label": "youtube 周杰倫",
+                      "color": "#0099ff",
                       "text": "youtube 周杰倫"
                     }
                   },
@@ -657,10 +657,10 @@ const LINE = {
                     "type": "button",
                     "style": "link",
                     "height": "sm",
-                    "color": "#0099ff",
                     "action": {
                       "type": "message",
                       "label": "天氣",
+                      "color": "#0099ff",
                       "text": "天氣"
                     }
                   },
@@ -668,10 +668,10 @@ const LINE = {
                     "type": "button",
                     "style": "link",
                     "height": "sm",
-                    "color": "#0099ff",
                     "action": {
                       "type": "message",
                       "label": "crypto currency",
+                      "color": "#0099ff",
                       "text": "crypto"
                     }
                   },
@@ -679,10 +679,10 @@ const LINE = {
                     "type": "button",
                     "style": "link",
                     "height": "sm",
-                    "color": "#0099ff",
                     "action": {
                       "type": "postback",
                       "label": "飲料店",
+                      "color": "#0099ff",
                       "data": "allResturant=true"
                     }
                   },
