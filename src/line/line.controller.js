@@ -675,17 +675,7 @@ const LINE = {
                       "text": "crypto"
                     }
                   },
-                  {
-                    "type": "button",
-                    "style": "link",
-                    "height": "sm",
-                    "action": {
-                      "type": "postback",
-                      "label": "飲料店",
-                      "color": "#0099ff",
-                      "data": "allResturant=true"
-                    }
-                  },
+
                   {
                     "type": "button",
                     "style": "primary",
@@ -714,7 +704,18 @@ const LINE = {
                       "label": "迷克夏",
                       "text": "迷克夏"
                     }
-                  }
+                  },
+                  {
+                    "type": "button",
+                    "style": "link",
+                    "height": "sm",
+                    "action": {
+                      "type": "postback",
+                      "label": "所有飲料店",
+                      "color": "#0099ff",
+                      "data": "allResturant=true"
+                    }
+                  },
                 ]
               }
             }
