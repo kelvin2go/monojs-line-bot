@@ -1,3 +1,6 @@
+[![加 開DIN 好友](https://scdn.line-apps.com/n/line_add_friends/btn/zh-Hant.png)](https://line.me/R/ti/p/%40lnl7301g)
+
+
 ![demo](static/din.gif)
 [![Video Demo](https://img.youtube.com/vi/YZz3XlxyXaU/0.jpg)](https://www.youtube.com/watch?v=YZz3XlxyXaU)
 
