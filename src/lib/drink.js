@@ -161,7 +161,10 @@ const DRINK = {
     return result
   },
   getOrder: async (orderId) => {
-    const data = await cachios.get(`${API_URL}/orders/${orderId}`, config)
+    const data = await cachios.get(`${API_URL}/orders/${orderId}`, {
+      ...config,
+      ttl: 5
+    })
     return data.data
   },
   sendOrder: async (userId, orderId, drinkObj) => {

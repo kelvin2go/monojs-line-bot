@@ -7,6 +7,12 @@ const DRINK = require('../lib/drink.js')
 const WITAI = require('../lib/witai.js')
 const FIREBASE = require('../lib/firebase.js')
 
+Date.prototype.yyyymmdd = function () {
+  const mm = this.getMonth() + 1
+  const dd = this.getDate()
+  return `${this.getFullYear()}-${(mm > 9 ? '' : '0') + mm}-${(dd > 9 ? '' : '0') + dd}`
+};
+
 // create LINE SDK config from env variables
 const config = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
@@ -150,12 +156,25 @@ const EventHandler = {
           console.log("start sending order")
           // `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=large`
           DRINK.startPendingOrder(userId, orderId)
+          const order = await DRINK.getOrder(orderId)
+          let owner = null
+          let created = null
+
+          if (order) {
+            if (order.fields.owner) {
+              owner = await DRINK.getUser(order.fields.owner)
+            }
+            if (order.fields.created_time) {
+              created = new Date(order.fields.created_time).yyyymmdd()
+            }
+          }
+
           return client.replyMessage(
             replyToken,
             [
               {
                 "type": "text",
-                "text": `你在跟 ${actionMap['resturant']} 團`
+                "text": `你在跟 ${owner ? owner.fields.displayName : ''} ${created ? created : ''} ${actionMap['resturant']} 團`
               },
               {
                 "type": "text",
@@ -267,7 +286,8 @@ const LINE = {
     )
   },
   wrapDrink: (resturant, drink, drinkButtons) => {
-    return {
+    console.log(drink)
+    return drink ? {
       "type": "flex",
       "altText": "Confirm Drink",
       "contents": {
@@ -277,10 +297,6 @@ const LINE = {
           "type": "box",
           "layout": "vertical",
           "spacing": "md",
-          "action": {
-            "type": "uri",
-            "uri": "https://linecorp.com"
-          },
           "contents": [
             {
               "type": "text",
@@ -303,12 +319,12 @@ const LINE = {
               "type": "box",
               "layout": "horizontal",
               "spacing": "sm",
-              "contents": drinkButtons
+              "contents": [...drinkButtons]
             }
           ]
         }
       }
-    }
+    } : null
   },
   handleText: async (message, replyToken, source) => {
     const buttonsImageURL = `${baseURL}/static/buttons/1040.jpg`;
@@ -398,10 +414,11 @@ const LINE = {
                             "contents": [
                               {
                                 "type": "text",
-                                "text": `${owner.fields.displayName} 開的團`,
+                                "text": `${owner.fields.displayName} 開的團 (${featureKey[1]})`,
                                 "weight": "bold",
                                 "margin": "sm",
-                                "flex": 0
+                                "flex": 0,
+                                "wrap": true
                               }
                             ]
                           },
@@ -409,7 +426,7 @@ const LINE = {
                       },
                       {
                         "type": "text",
-                        "text": `${new Date(order.createdTime).toString()}`,
+                        "text": `${new Date(order.createdTime).yyyymmdd()}`,
                         "size": "sm",
                         "align": "end",
                         "color": "#aaaaaa"
@@ -438,7 +455,6 @@ const LINE = {
                         "size": "xs",
                         "align": "end"
                       }
-
                     ]
                   },
                   "footer": {
@@ -447,30 +463,21 @@ const LINE = {
                     "contents": [
                       {
                         "type": "button",
-                        "style": "primary",
-                        "action": {
-                          "type": "postback",
-                          "label": "確定跟團",
-                          "data": `joinGroupOrder=true&orderId=${order.id}&resturant=${resturant.name}`
-                        }
-                      },
-                      {
-                        "type": "button",
-                        "style": "link",
-                        "action": {
-                          "type": "postback",
-                          "label": "不是",
-                          "data": "no"
-                        }
-                      },
-                      {
-                        "type": "button",
                         "style": "link",
                         "height": "sm",
                         "action": {
                           "type": "postback",
                           "label": "飲品價目表",
                           "data": `drinkMenu=${resturant.name}`
+                        }
+                      },
+                      {
+                        "type": "button",
+                        "style": "primary",
+                        "action": {
+                          "type": "postback",
+                          "label": "確定跟團",
+                          "data": `joinGroupOrder=true&orderId=${order.id}&resturant=${resturant.name}`
                         }
                       },
                     ]
@@ -840,13 +847,16 @@ const LINE = {
       const restName = intent.key.replace('drink_name_', '')
       const resturant = await DRINK.resturantSearch(restName)
       console.log(resturant)
-      const drinks = await DRINK.searchDrink(resturant.index, intent.value)
+      const drinks = (await DRINK.searchDrink(resturant.index, intent.value)).slice(0, 3).reverse()
+
       const pendingOrder = DRINK.hasPendingOrder(userId)
-      let pendingMsg = {}
+      let pendingMsg = undefined
       if (pendingOrder && pendingOrder[0]) {
         const pendingOrderObject = await DRINK.getOrder(pendingOrder[0])
+        console.log(pendingOrderObject)
+        console.log(")))))")
         if (pendingOrderObject) {
-          if (pendingOrderObject.fields.restaurant_index !== resturant.id) {
+          if (pendingOrderObject.fields.restaurant_index[0] !== resturant.id) {
             pendingMsg = {
               type: 'text', text: `找到的 飲料 跟 開團的不一樣哦! 請確定這家有 '${intent.value}'`
             }
@@ -856,13 +866,13 @@ const LINE = {
         pendingMsg = { type: 'text', text: "可是你還沒開團/跟團" }
       }
       // console.log(pendingOrder)
-      const drinkButtons = drinks.slice(0, 3).map((x, index) => {
+      const drinkButtons = drinks.map((x, index) => {
         const result = []
         const medium = x.fields.medium ?
           {
             "type": "button",
             "style": "primary",
-            ... (index === 0 ? null : { color: "#905c44" }),
+            ... (index === drinks.length - 1 ? null : { color: "#905c44" }),
             "action": {
               "type": "postback",
               "label": `中 $${x.fields.medium} `,
@@ -875,7 +885,7 @@ const LINE = {
           {
             "type": "button",
             "style": "primary",
-            ... (index === 0 ? null : { color: "#905c44" }),
+            ... (index === drinks.length - 1 ? null : { color: "#905c44" }),
             "action": {
               "type": "postback",
               "label": `大 $${x.fields.large} `,
@@ -887,18 +897,23 @@ const LINE = {
         if (large) result.push(large)
         return result
       })
-
-      return client.replyMessage(
-        replyToken,
-        [
-          ...drinks.slice(0, 3).map((x, index) => {
+      console.log(drinks)
+      console.log(drinkButtons)
+      const messages = [
+        ...drinks.map((x, index) => {
+          if (x) {
+            console.log(x)
+            console.log('000000')
             return LINE.wrapDrink(resturant, x, drinkButtons[index])
-          }).reverse(),
-          pendingMsg
-        ]
-      )
+          }
+          return
+        })
+      ]
+      if (pendingMsg) {
+        messages.push(pendingMsg)
+      }
+      return client.replyMessage(replyToken, messages)
     }
-
 
     // other utils
     if ((intent.key === 'bot_feature' && intent.value === 'youtube') || intent.key === 'youtube' || key === 'youtube' || menu.youtube.indexOf(key) > -1) {
