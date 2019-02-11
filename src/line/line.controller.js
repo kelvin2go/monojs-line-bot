@@ -672,7 +672,7 @@ const LINE = {
                     "action": {
                       "type": "message",
                       "label": "crypto currency",
-                      "text": "crypto btc"
+                      "text": "crypto"
                     }
                   },
                   {
@@ -690,6 +690,7 @@ const LINE = {
                     "type": "button",
                     "style": "primary",
                     "color": "#F5CC4F",
+                    "height": "sm",
                     "action": {
                       "type": "message",
                       "label": "把·開din·傳出去！",
@@ -708,7 +709,6 @@ const LINE = {
                   {
                     "type": "button",
                     "style": "primary",
-                    "height": "sm",
                     "action": {
                       "type": "message",
                       "label": "迷克夏",
