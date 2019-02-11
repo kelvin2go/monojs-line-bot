@@ -7,7 +7,6 @@ const DRINK = require('../lib/drink.js')
 const WITAI = require('../lib/witai.js')
 // const FIREBASE = require('../lib/firebase.js')
 
-const _orderBy = require('lodash/orderBy')
 Date.prototype.yyyymmdd = function () {
   const mm = this.getMonth() + 1
   const dd = this.getDate()
