@@ -12,6 +12,7 @@ Date.prototype.yyyymmdd = function () {
   const dd = this.getDate()
   return `${this.getFullYear()}-${(mm > 9 ? '' : '0') + mm}-${(dd > 9 ? '' : '0') + dd}`
 };
+const dd = process.env.NODE_ENV !== 'production'
 
 // create LINE SDK config from env variables
 const config = {
@@ -38,11 +39,11 @@ const EventHandler = {
     const replyToken = event.replyToken
     const postBackData = event.postback.data
     const userId = event.source.userId
-    console.log(postBackData)
+    if (dd) console.log(postBackData)
     const actionMap = JSON.parse('{"' + decodeURI(postBackData.replace(/&/g, "\",\"").replace(/=/g, "\":\"")) + '"}')
     const key = Object.keys(actionMap)[0]
     if (key) {
-      console.log(key, actionMap[key])
+      if (dd) console.log(key, actionMap[key])
       if (key === 'DATE' || key === 'TIME' || key === 'DATETIME') {
         const textdata = `${key} (${JSON.stringify(event.postback.params)})`
         return LINE.replyText(replyToken, `Got postback: ${textdata}`)
@@ -286,7 +287,7 @@ const LINE = {
     )
   },
   wrapDrink: (resturant, drink, drinkButtons) => {
-    console.log(drink)
+    if (dd) console.log(drink)
     return drink ? {
       "type": "flex",
       "altText": "Confirm Drink",
@@ -734,7 +735,7 @@ const LINE = {
             ...usersList,
             [source.userId]: profile
           }
-          console.log(usersList)
+          if (dd) console.log(usersList)
         })
     }
     // if (key === 'start' || menu.start.indexOf(key) > -1) {
@@ -850,15 +851,15 @@ const LINE = {
     if (intent.key.startsWith('drink_name')) {
       const restName = intent.key.replace('drink_name_', '')
       const resturant = await DRINK.resturantSearch(restName)
-      console.log(resturant)
+      if (dd) console.log(resturant)
       const drinks = (await DRINK.searchDrink(resturant.index, intent.value)).slice(0, 3).reverse()
 
       const pendingOrder = DRINK.hasPendingOrder(userId)
       let pendingMsg = undefined
       if (pendingOrder && pendingOrder[0]) {
         const pendingOrderObject = await DRINK.getOrder(pendingOrder[0])
-        console.log(pendingOrderObject)
-        console.log(")))))")
+        if (dd) console.log(pendingOrderObject)
+        if (dd) console.log(")))))")
         if (pendingOrderObject) {
           if (pendingOrderObject.fields.restaurant_index[0] !== resturant.id) {
             pendingMsg = {
@@ -901,13 +902,13 @@ const LINE = {
         if (large) result.push(large)
         return result
       })
-      console.log(drinks)
-      console.log(drinkButtons)
+      if (dd) console.log(drinks)
+      if (dd) console.log(drinkButtons)
       const messages = [
         ...drinks.map((x, index) => {
           if (x) {
-            console.log(x)
-            console.log('000000')
+            // console.log(x)
+            // console.log('000000')
             return LINE.wrapDrink(resturant, x, drinkButtons[index])
           }
           return

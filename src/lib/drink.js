@@ -96,7 +96,7 @@ const DRINK = {
     const fuse = new Fuse(data.data.records, userOption)
     const result = fuse.search(userId)
     if (result.length > 0) {
-      console.log(result)
+      // console.log(result)
       return result[0]
     }
     return false
@@ -153,11 +153,11 @@ const DRINK = {
         "fields.Name"
       ]
     }
-    console.log(drinkOption)
+    // console.log(drinkOption)
     const fuse = new Fuse(drinkList, drinkOption)
     const result = fuse.search(drinkName)
-    console.log('---')
-    console.log(result)
+    // console.log('---')
+    // console.log(result)
     return result
   },
   getOrder: async (orderId) => {
@@ -174,7 +174,7 @@ const DRINK = {
     if (!profile) {
       profile = await LINEClient.getProfile(userId)
     }
-    console.log(profile)
+    // console.log(profile)
     const fields = {
       order: JSON.stringify([
         ...JSON.parse(order.fields.order || "[]"),
@@ -207,11 +207,11 @@ const DRINK = {
         ...[DRINK.pendingOrder.hasOwnProperty(userId) ? DRINK.pendingOrder[userId] : null],
       ]
     }
-    console.log(DRINK.pendingOrder)
+    // console.log(DRINK.pendingOrder)
     return DRINK.pendingOrder
   },
   hasPendingOrder: (userId) => {
-    console.log(DRINK.pendingOrder.hasOwnProperty(userId) ? DRINK.pendingOrder[userId] : false)
+    // console.log(DRINK.pendingOrder.hasOwnProperty(userId) ? DRINK.pendingOrder[userId] : false)
     return DRINK.pendingOrder.hasOwnProperty(userId) ? DRINK.pendingOrder[userId] : false
   }
 
