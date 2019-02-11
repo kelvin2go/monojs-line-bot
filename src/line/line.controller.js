@@ -646,6 +646,7 @@ const LINE = {
                     "type": "button",
                     "style": "link",
                     "height": "sm",
+                    "color": "#0099ff",
                     "action": {
                       "type": "message",
                       "label": "youtube 周杰倫",
@@ -656,6 +657,7 @@ const LINE = {
                     "type": "button",
                     "style": "link",
                     "height": "sm",
+                    "color": "#0099ff",
                     "action": {
                       "type": "message",
                       "label": "天氣",
@@ -666,6 +668,7 @@ const LINE = {
                     "type": "button",
                     "style": "link",
                     "height": "sm",
+                    "color": "#0099ff",
                     "action": {
                       "type": "message",
                       "label": "crypto currency",
@@ -676,6 +679,7 @@ const LINE = {
                     "type": "button",
                     "style": "link",
                     "height": "sm",
+                    "color": "#0099ff",
                     "action": {
                       "type": "postback",
                       "label": "飲料店",
