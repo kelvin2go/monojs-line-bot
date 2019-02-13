@@ -195,7 +195,18 @@ const EventHandler = {
         console.log("start sending order2")
         const orderId = actionMap.orderId
         if (orderId && orderId !== 'undefined') {
-
+          const sugar = {
+            '無糖': "#F3E2A9",
+            '少糖': "#F7D358",
+            '半糖': "#FACC2E",
+            '全糖': "#FF8000",
+          }
+          const icecube = {
+            '去冰': "#A9F5F2",
+            '微冰': "#2ECCFA",
+            '少冰': "#0080FF",
+            '正常': "#0174DF",
+          }
           if (actionMap[key] === 'start') {
             return client.replyMessage(
               replyToken,
@@ -231,10 +242,11 @@ const EventHandler = {
                         "layout": "horizontal",
                         "spacing": "sm",
                         "contents": [
-                          ...['無糖', '少糖', '半糖', '全糖'].map(x => {
+                          ...Object.keys(sugar).map(x => {
                             return {
                               "type": "button",
                               "style": "primary",
+                              "color": sugar[x],
                               "action": {
                                 "type": "postback",
                                 "label": `${x}`,
@@ -287,10 +299,11 @@ const EventHandler = {
                         "layout": "horizontal",
                         "spacing": "sm",
                         "contents": [
-                          ...['去冰', '微冰', '少冰', '正常'].map(x => {
+                          ...Object.keys(icecube).map(x => {
                             return {
                               "type": "button",
                               "style": "primary",
+                              "color": icecube[x],
                               "action": {
                                 "type": "postback",
                                 "label": `${x}`,
