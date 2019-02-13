@@ -139,7 +139,11 @@ const EventHandler = {
             [
               {
                 "type": "text",
-                "text": `你的 ${resturant.name} 團已開：(團號如下，分享團號讓別人加入)`
+                "text": `你的 ${resturant.name} 團已開：(團號如下)，分享團號讓別人加入`
+              },
+              {
+                "type": "text",
+                "text": `其他人跟團 只要打入 "跟團號 ${order.id}" 他選的飲料 就會出到同一張單了`
               },
               {
                 "type": "text",
@@ -712,7 +716,7 @@ const LINE = {
       const firstKey = sortedEntities[0]
       const firstElement = witIntent.entities[firstKey][0]
       if (firstElement.hasOwnProperty('confidence')) {
-        if (firstElement.confidence * 100 > 88) {
+        if (firstElement.confidence * 100 > 88 || firstKey.startsWith('drink_name')) {
           intent = {
             key: firstKey,
             value: firstElement.value
