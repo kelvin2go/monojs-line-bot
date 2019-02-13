@@ -738,7 +738,7 @@ const LINE = {
                   type: 'confirm',
                   text: `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
                   actions: [
-                    { label: 'Yes', type: 'message', text: `是! ${firstElement.value}` },
+                    { label: 'Yes', type: 'message', text: `${firstElement.value}` },
                     { label: 'No', type: 'message', text: `否! ${firstElement.value}` },
                   ],
                 },
@@ -1084,7 +1084,7 @@ const LINE = {
       return LINE.replyText(
         replyToken,
         [
-          `好的，謝謝。 過一陣子 ～～～ 我會記起來～`
+          `好的，謝謝你教我過新字。 \n過一陣子 ～～～ 我會記起來～`
         ]
       )
     }
