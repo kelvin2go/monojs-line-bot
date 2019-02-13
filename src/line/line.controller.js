@@ -10,7 +10,12 @@ const WITAI = require('../lib/witai.js')
 Date.prototype.yyyymmdd = function () {
   const mm = this.getMonth() + 1
   const dd = this.getDate()
-  return `${this.getFullYear()}-${(mm > 9 ? '' : '0') + mm}-${(dd > 9 ? '' : '0') + dd}`
+  return `${this.getFullYear()}-${(mm > 9 ? '' : '0') + mm}-${(dd > 9 ? '' : '0') + dd} ${this.getHours()}:${this.getMinutes()}`
+};
+Date.prototype.daytime = function () {
+  const mm = this.getMonth() + 1
+  const dd = this.getDate()
+  return `${(mm > 9 ? '' : '0') + mm}-${(dd > 9 ? '' : '0') + dd} ${this.getHours()}:${this.getMinutes()}`
 };
 const dd = process.env.NODE_ENV !== 'production'
 
@@ -22,10 +27,10 @@ const config = {
 // console.log(config)
 // console.log(process.env)
 // base URL for webhook server
-const baseURL = process.env.BASE_URL;
-var usersList = [];
+const baseURL = process.env.BASE_URL
+var usersList = []
 // create LINE SDK client
-const client = new line.Client(config);
+const client = new line.Client(config)
 const menu = {
   start: ['開始', 'hi', 'hello'],
   youtube: ['yt'],
@@ -294,13 +299,8 @@ const EventHandler = {
             ]
 
           )
-
         }
-
       }
-
-
-
     }
   }
 }
@@ -319,7 +319,6 @@ const LINE = {
           ...usersList,
           [userId]: profile
         }
-
       }
     }
     return profile
@@ -578,46 +577,7 @@ const LINE = {
 
     }
 
-    // WIT
-    if (witIntent.hasOwnProperty('entities')) {
-      const sortedEntities = Object.keys(witIntent.entities).sort((a, b) => {
-        return witIntent.entities[b][0].confidence - witIntent.entities[a][0].confidence
-      })
-      const firstKey = sortedEntities[0]
-      const firstElement = witIntent.entities[firstKey][0]
-      if (firstElement.hasOwnProperty('confidence')) {
-        if (firstElement.confidence * 100 > 90) {
-          intent = {
-            key: firstKey,
-            value: firstElement.value
-          }
-        } else {
-          console.log(`Too low confidence ${firstElement.confidence}`)
-          return client.replyMessage(
-            replyToken,
-            [
-              {
-                "type": "text",
-                "text": `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
-              },
-              {
-                type: 'template',
-                altText: 'correcting words',
-                template: {
-                  type: 'confirm',
-                  text: `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
-                  actions: [
-                    { label: 'Yes', type: 'message', text: `是! ${firstElement.value}` },
-                    { label: 'No', type: 'message', text: `否! ${firstElement.value}` },
-                  ],
-                },
-              }
-            ]
-          )
-        }
-      }
-    }
-    if (intent.key === 'menu' || intent.key === 'greetings') {
+    if (key.startsWith('menu') || intent.key === 'menu' || intent.key === 'greetings') {
       return client.replyMessage(
         replyToken,
         {
@@ -792,6 +752,15 @@ const LINE = {
                   "style": "link",
                   "action": {
                     "type": "message",
+                    "label": "我的團",
+                    "text": "myorder"
+                  }
+                },
+                {
+                  "type": "button",
+                  "style": "link",
+                  "action": {
+                    "type": "message",
                     "label": "迷克夏",
                     "text": "迷克夏"
                   }
@@ -827,24 +796,82 @@ const LINE = {
           if (dd) console.log(usersList)
         })
     }
-    // if (key === 'start' || menu.start.indexOf(key) > -1) {
-    //   if (userId) {
-    //     const profile = await client.getProfile(userId)
-    //     let greeting = `您好 ${profile.displayName}\n,`
 
-    //     return LINE.replyText(
-    //       replyToken,
-    //       [
-    //         greeting,
-    //         `選單: ${Object.keys(menu).map((x) => {
-    //           return '\n' + [x, ...menu[x]].join(', ')
-    //         })} \n`
-    //       ]
-    //     )
-    //   } else {
-    //     return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
-    //   }
-    // }
+    // WIT
+    if (witIntent.hasOwnProperty('entities')) {
+      const sortedEntities = Object.keys(witIntent.entities).sort((a, b) => {
+        return witIntent.entities[b][0].confidence - witIntent.entities[a][0].confidence
+      })
+      const firstKey = sortedEntities[0]
+      const firstElement = witIntent.entities[firstKey][0]
+      if (firstElement.hasOwnProperty('confidence')) {
+        if (firstElement.confidence * 100 > 88) {
+          intent = {
+            key: firstKey,
+            value: firstElement.value
+          }
+        } else {
+          console.log(`Too low confidence ${firstElement.confidence}`)
+          return client.replyMessage(
+            replyToken,
+            [
+              {
+                "type": "text",
+                "text": `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
+              },
+              {
+                type: 'template',
+                altText: 'correcting words',
+                template: {
+                  type: 'confirm',
+                  text: `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
+                  actions: [
+                    { label: 'Yes', type: 'message', text: `是! ${firstElement.value}` },
+                    { label: 'No', type: 'message', text: `否! ${firstElement.value}` },
+                  ],
+                },
+              }
+            ]
+          )
+        }
+      }
+    }
+
+    if (intent.key === 'my_order') {
+      const myOrders = await DRINK.getMyOrder(userId)
+      const response = myOrders.length > 0 ?
+        myOrders.map(order => {
+          return {
+            "type": "button",
+            "style": "link",
+            "height": "sm",
+            "action": {
+              "type": "message",
+              "label": `${new Date(order.fields.created_time).daytime()} ${order.id}`,
+              "text": `團號 ${order.id}`
+            }
+          }
+        }) :
+        [{
+          "type": "text",
+          "text": "你還沒有開團",
+        }]
+      return client.replyMessage(
+        replyToken,
+        {
+          "type": "flex",
+          "altText": `我的團`,
+          "contents": {
+            "type": "bubble",
+            "footer": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": response
+            }
+          }
+        }
+      )
+    }
 
     if (intent.key === 'drink_resturant') {
       console.log('sending resutant image')

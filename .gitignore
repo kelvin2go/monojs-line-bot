@@ -17,3 +17,6 @@ coverage
 
 # Local conf
 conf/local.js
+
+
+.line-env

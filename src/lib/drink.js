@@ -172,6 +172,18 @@ const DRINK = {
     })
     return data.data
   },
+  getMyOrder: async (userId) => {
+    const data = await cachios.get(`${API_URL}/orders?view=Grid%20view`, {
+      ...config,
+      ttl: 5
+    })
+    const myorder = data.data.records.filter(x => {
+      if (x.fields.owner === userId) {
+        return x
+      }
+    })
+    return myorder
+  },
   sendOrder: async (userId, orderId, drinkObj) => {
     if (!orderId) console.log("no orderId on sendOrder")
     const order = await DRINK.getOrder(orderId)

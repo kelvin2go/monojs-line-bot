@@ -3,3 +3,6 @@ CHANNEL_ACCESS_TOKEN={accessTOKEN}
 CHANNEL_SECRET={secret}
 YOUTUBE_KEY={youtubeKeyV3}
 WITAI={WITAI_TOKEN}
+AIR_TABLE_API_TOKEN={token}
+AIR_TABLE_API_DRINK={tableID}
+BASE_URL=https://raw.githubusercontent.com/kelvin2go/monojs-line-bot/master
