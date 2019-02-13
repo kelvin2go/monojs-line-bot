@@ -605,7 +605,7 @@ const LINE = {
             key: firstKey,
             value: firstElement.value
           }
-        } else if (!(firstKey in menuKeywords)) {
+        } else if (menuKeywords.indexOf(key) === -1) {
           console.log(`Too low confidence ${firstElement.confidence}`)
           return client.replyMessage(
             replyToken,
