@@ -414,7 +414,7 @@ const LINE = {
     const witIntent = await WITAI.getIntent(trimText)
     console.log(witIntent)
     let intent = ''
-
+    const menuKeywords = ['menu', 'hi', '跟團號', '團號']
     if (key.startsWith('跟團號') || key.startsWith('團號')) {
       if (userId) {
         try {
@@ -574,7 +574,62 @@ const LINE = {
           )
         }
       }
+    }
 
+    let featureValue = [...featureKey]
+    featureValue.shift()
+    featureValue = featureValue.join(' ')
+    if (source.userId) {
+      client.getProfile(userId)
+        .then((profile) => {
+          // FIREBASE.addUser(profile)
+          DRINK.addUser(userId)
+          usersList = {
+            ...usersList,
+            [source.userId]: profile
+          }
+          if (dd) console.log(usersList)
+        })
+    }
+
+    // WIT
+    if (witIntent.hasOwnProperty('entities')) {
+      const sortedEntities = Object.keys(witIntent.entities).sort((a, b) => {
+        return witIntent.entities[b][0].confidence - witIntent.entities[a][0].confidence
+      })
+      const firstKey = sortedEntities[0]
+      const firstElement = witIntent.entities[firstKey][0]
+      if (firstElement.hasOwnProperty('confidence')) {
+        if (firstElement.confidence * 100 > 88) {
+          intent = {
+            key: firstKey,
+            value: firstElement.value
+          }
+        } else if (!(firstKey in menuKeywords)) {
+          console.log(`Too low confidence ${firstElement.confidence}`)
+          return client.replyMessage(
+            replyToken,
+            [
+              {
+                "type": "text",
+                "text": `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
+              },
+              {
+                type: 'template',
+                altText: 'correcting words',
+                template: {
+                  type: 'confirm',
+                  text: `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
+                  actions: [
+                    { label: 'Yes', type: 'message', text: `是! ${firstElement.value}` },
+                    { label: 'No', type: 'message', text: `否! ${firstElement.value}` },
+                  ],
+                },
+              }
+            ]
+          )
+        }
+      }
     }
 
     if (key.startsWith('menu') || intent.key === 'menu' || intent.key === 'greetings') {
@@ -781,62 +836,6 @@ const LINE = {
       )
     }
 
-    let featureValue = [...featureKey]
-    featureValue.shift()
-    featureValue = featureValue.join(' ')
-    if (source.userId) {
-      client.getProfile(userId)
-        .then((profile) => {
-          // FIREBASE.addUser(profile)
-          DRINK.addUser(userId)
-          usersList = {
-            ...usersList,
-            [source.userId]: profile
-          }
-          if (dd) console.log(usersList)
-        })
-    }
-
-    // WIT
-    if (witIntent.hasOwnProperty('entities')) {
-      const sortedEntities = Object.keys(witIntent.entities).sort((a, b) => {
-        return witIntent.entities[b][0].confidence - witIntent.entities[a][0].confidence
-      })
-      const firstKey = sortedEntities[0]
-      const firstElement = witIntent.entities[firstKey][0]
-      if (firstElement.hasOwnProperty('confidence')) {
-        if (firstElement.confidence * 100 > 88) {
-          intent = {
-            key: firstKey,
-            value: firstElement.value
-          }
-        } else {
-          console.log(`Too low confidence ${firstElement.confidence}`)
-          return client.replyMessage(
-            replyToken,
-            [
-              {
-                "type": "text",
-                "text": `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
-              },
-              {
-                type: 'template',
-                altText: 'correcting words',
-                template: {
-                  type: 'confirm',
-                  text: `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
-                  actions: [
-                    { label: 'Yes', type: 'message', text: `是! ${firstElement.value}` },
-                    { label: 'No', type: 'message', text: `否! ${firstElement.value}` },
-                  ],
-                },
-              }
-            ]
-          )
-        }
-      }
-    }
-
     if (intent.key === 'my_order') {
       const myOrders = await DRINK.getMyOrder(userId)
       const response = myOrders.length > 0 ?
@@ -961,6 +960,15 @@ const LINE = {
           originalContentUrl: pic.url,
           previewImageUrl: pic.url,
         }
+      )
+    }
+
+    if (intent.key === 'confirm_new_word') {
+      return LINE.replyText(
+        replyToken,
+        [
+          `好的，謝謝。 過一陣子 ～～～ 我會記起來～`
+        ]
       )
     }
 
