@@ -1084,7 +1084,7 @@ const LINE = {
       return LINE.replyText(
         replyToken,
         [
-          `好的，謝謝你教我過新字。 \n過一陣子 ～～～ 我會記起來～`
+          `好的，謝謝你教我新字。 \n過一陣子 ～～～ 我會記起來～`
         ]
       )
     }
