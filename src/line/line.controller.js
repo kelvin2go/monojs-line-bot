@@ -28,7 +28,6 @@ const config = {
 // console.log(process.env)
 // base URL for webhook server
 const baseURL = process.env.BASE_URL
-var usersList = []
 // create LINE SDK client
 const client = new line.Client(config)
 const menu = {
@@ -429,15 +428,7 @@ const LINE = {
   getProfile: async (userId) => {
     let profile = {}
     if (userId) {
-      profile = await client.getProfile(userId)
-      if (profile) {
-        // FIREBASE.addUser(profile)
-        DRINK.addUser(userId)
-        usersList = {
-          ...usersList,
-          [userId]: profile
-        }
-      }
+      await DRINK.addUser(userId)
     }
     return profile
   },
@@ -697,16 +688,7 @@ const LINE = {
     featureValue.shift()
     featureValue = featureValue.join(' ')
     if (source.userId) {
-      client.getProfile(userId)
-        .then((profile) => {
-          // FIREBASE.addUser(profile)
-          DRINK.addUser(userId)
-          usersList = {
-            ...usersList,
-            [source.userId]: profile
-          }
-          if (dd) console.log(usersList)
-        })
+      await DRINK.addUser(userId)
     }
 
     // WIT

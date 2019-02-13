@@ -112,7 +112,7 @@ const DRINK = {
       userId: profile.userId,
       displayName: profile.displayName,
       pictureUrl: profile.pictureUrl,
-      avatar: { url: profile.pictureUrl },
+      avatar: [{ url: profile.pictureUrl }],
       profile: JSON.stringify(profile)
     }
     let result = {}
