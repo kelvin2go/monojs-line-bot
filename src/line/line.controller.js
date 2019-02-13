@@ -160,7 +160,7 @@ const EventHandler = {
         const orderId = actionMap['orderId']
         if (orderId && orderId !== 'undefined') {
           console.log("start sending order")
-          // `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=large`
+          // `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=large&resutrant=id`
           DRINK.startPendingOrder(userId, orderId)
           const order = await DRINK.getOrder(orderId)
           let owner = null
@@ -191,36 +191,154 @@ const EventHandler = {
         }
       }
 
+
       if (key === 'setDrinkOrder') {
         console.log("start sending order2")
-        const orderId = actionMap['orderId']
+        const orderId = actionMap.orderId
         if (orderId && orderId !== 'undefined') {
-          console.log("start sending order")
-          // `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=large&resutrant=id`
-          await DRINK.sendOrder(userId, orderId, {
-            drink: actionMap['drink'],
-            size: actionMap['size'],
-            price: actionMap['price']
-          })
 
-          DRINK.clearPendingOrder(userId)
-          return client.replyMessage(
-            replyToken,
-            [
-              {
-                "type": "text",
-                "text": `已成功跟團`
-              },
-              {
-                "type": "text",
-                "text": "如要檢查結果:"
-              },
-              {
-                "type": "text",
-                "text": `團號 ${orderId}`
-              }
-            ]
-          )
+          if (actionMap[key] === 'start') {
+            return client.replyMessage(
+              replyToken,
+              [{
+                "type": "flex",
+                "altText": "Confirm Drink option - sugar",
+                "contents": {
+                  "type": "bubble",
+                  "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "md",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": `${actionMap.drink}`,
+                        "wrap": true,
+                        "size": "lg"
+                      },
+                      {
+                        "type": "text",
+                        "text": "請問甜度：",
+                        "wrap": true,
+                      }
+                    ]
+                  },
+                  "footer": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "spacing": "sm",
+                        "contents": [
+                          ...['無糖', '少糖', '半糖', '全糖'].map(x => {
+                            return {
+                              "type": "button",
+                              "style": "primary",
+                              "action": {
+                                "type": "postback",
+                                "label": `${x}`,
+                                "data": `setDrinkOrder=sugarOption&orderId=${orderId}&drink=${actionMap.drink}&size=${actionMap.size}&sugar=${x}&price=${actionMap.price}&resturant=${actionMap.resturant}`
+                              }
+                            }
+                          })
+
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }]
+            )
+          }
+
+          if (actionMap[key] === 'sugarOption') {
+            return client.replyMessage(
+              replyToken,
+              [{
+                "type": "flex",
+                "altText": "Confirm Drink option",
+                "contents": {
+                  "type": "bubble",
+                  "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "md",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": `${actionMap.drink}`,
+                        "wrap": true,
+                        "size": "lg"
+                      },
+                      {
+                        "type": "text",
+                        "text": "請問冰塊：",
+                        "wrap": true,
+                      }
+                    ]
+                  },
+                  "footer": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "spacing": "sm",
+                        "contents": [
+                          ...['去冰', '微冰', '少冰', '正常'].map(x => {
+                            return {
+                              "type": "button",
+                              "style": "primary",
+                              "action": {
+                                "type": "postback",
+                                "label": `${x}`,
+                                "data": `setDrinkOrder=ready&orderId=${orderId}&drink=${actionMap.drink}&size=${actionMap.size}&sugar=${actionMap.sugar}&ice=${x}&price=${actionMap.price}&resturant=${actionMap.resturant}`
+                              }
+                            }
+                          })
+
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }]
+            )
+          }
+
+          if (actionMap[key] === 'ready') {
+            console.log("start sending order")
+            // `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=large&resutrant=id`
+            await DRINK.sendOrder(userId, orderId, {
+              drink: actionMap['drink'],
+              size: actionMap['size'],
+              sugar: actionMap['sugar'],
+              ice: actionMap['ice'],
+              price: actionMap['price']
+            })
+
+            DRINK.clearPendingOrder(userId)
+            return client.replyMessage(
+              replyToken,
+              [
+                {
+                  "type": "text",
+                  "text": `已成功跟團`
+                },
+                {
+                  "type": "text",
+                  "text": "如要檢查結果:"
+                },
+                {
+                  "type": "text",
+                  "text": `團號 ${orderId}`
+                }
+              ]
+            )
+          }
         } else { // ask for 開團
           const resturant = await DRINK.resturantSearch(actionMap['resturant'])
           return client.replyMessage(
@@ -370,7 +488,6 @@ const LINE = {
       "altText": "Confirm Drink",
       "contents": {
         "type": "bubble",
-
         "body": {
           "type": "box",
           "layout": "vertical",
@@ -430,12 +547,13 @@ const LINE = {
               return orders.map(x => {
                 return {
                   "type": "box",
-                  "layout": "horizontal",
+                  "layout": "baseline",
                   "contents": [
                     {
                       "type": "text",
-                      "text": `${x.username} ${x.drink.drink} ${x.drink.size === 'large' ? '大' : x.drink.size === 'medium' ? '中' : ''}`,
+                      "text": `${x.username} ${x.drink.drink}(${x.drink.size === 'large' ? '大' : x.drink.size === 'medium' ? '中' : ''} ${x.drink.sugar ? x.drink.sugar : ''} ${x.drink.ice ? x.drink.ice : ''})`,
                       "size": "sm",
+                      "wrap": true,
                       "color": "#555555",
                       "flex": 0
                     },
@@ -455,7 +573,6 @@ const LINE = {
               {
                 "type": "box",
                 "layout": "vertical",
-                "margin": "xxl",
                 "spacing": "sm",
                 "contents": groupInfo
               } : {
@@ -842,7 +959,7 @@ const LINE = {
         myOrders.map(order => {
           return {
             "type": "button",
-            "style": "link",
+            "style": "primary",
             "height": "sm",
             "action": {
               "type": "message",
