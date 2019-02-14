@@ -139,11 +139,11 @@ const EventHandler = {
             [
               {
                 "type": "text",
-                "text": `你的 ${resturant.name} 團已開：(團號如下)，分享團號讓別人加入`
+                "text": `你的 ${resturant.name} 團已開!`
               },
               {
                 "type": "text",
-                "text": `其他人跟團 只要打入 "跟團號 ${order.id}" 他選的飲料 就會出到同一張單了`
+                "text": `邀人方法:\n1。只要他跟'開DIN' 打入 "跟團號 ${order.id}"\n2。他選完飲料、就會出到同一張單了`
               },
               {
                 "type": "text",
@@ -210,6 +210,10 @@ const EventHandler = {
             '微冰': "#2ECCFA",
             '少冰': "#0080FF",
             '正常': "#0174DF",
+          }
+          const temperature = {
+            '溫': "#eaacac",
+            '熱': "#ff0000"
           }
           if (actionMap[key] === 'start') {
             return client.replyMessage(
@@ -314,8 +318,26 @@ const EventHandler = {
                                 "data": `setDrinkOrder=ready&orderId=${orderId}&drink=${actionMap.drink}&size=${actionMap.size}&sugar=${actionMap.sugar}&ice=${x}&price=${actionMap.price}&resturant=${actionMap.resturant}`
                               }
                             }
+                          }),
+                        ]
+                      },
+                      {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "spacing": "sm",
+                        "contents": [
+                          ...Object.keys(temperature).map(x => {
+                            return {
+                              "type": "button",
+                              "style": "primary",
+                              "color": temperature[x],
+                              "action": {
+                                "type": "postback",
+                                "label": `${x}`,
+                                "data": `setDrinkOrder=ready&orderId=${orderId}&drink=${actionMap.drink}&size=${actionMap.size}&sugar=${actionMap.sugar}&ice=${x}&price=${actionMap.price}&resturant=${actionMap.resturant}`
+                              }
+                            }
                           })
-
                         ]
                       }
                     ]
@@ -346,11 +368,34 @@ const EventHandler = {
                 },
                 {
                   "type": "text",
-                  "text": "如要檢查結果:"
+                  "text": `${actionMap['drink']}(${actionMap['size'] === 'large' ? '大' : '中'} ${actionMap['sugar']} ${actionMap['ice']})`
                 },
                 {
                   "type": "text",
-                  "text": `團號 ${orderId}`
+                  "text": "如要檢查結果:"
+                },
+                {
+                  "type": "flex",
+                  "altText": "This is a Flex Message",
+                  "contents": {
+                    "type": "bubble",
+                    "footer": {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "button",
+                          "style": "primary",
+                          "action": {
+                            "type": "message",
+                            "label": `團號 ${orderId}`,
+                            "text": `團號 ${orderId}`
+                          }
+                        }
+                      ]
+                    }
+                  }
                 }
               ]
             )
@@ -489,7 +534,7 @@ const LINE = {
       }
     )
   },
-  wrapDrink: (resturant, drink, drinkButtons) => {
+  wrapDrink: (drink, drinkButtons) => {
     if (dd) console.log(drink)
     return drink ? {
       "type": "flex",
@@ -503,7 +548,7 @@ const LINE = {
           "contents": [
             {
               "type": "text",
-              "text": `${resturant.name} ${drink.fields.Name}`,
+              "text": `${drink.resturant.name} ${drink.fields.Name}`,
               "wrap": true,
               "size": "lg"
             },
@@ -602,30 +647,23 @@ const LINE = {
                     "contents": [
                       {
                         "type": "text",
-                        "text": `${resturant.name}`,
-                        "size": "xl",
+                        "text": `團單 `,
+                        "color": "#00db94",
                         "weight": "bold"
                       },
                       {
-                        "type": "box",
-                        "layout": "vertical",
-                        "spacing": "sm",
-                        "contents": [
-                          {
-                            "type": "box",
-                            "layout": "baseline",
-                            "contents": [
-                              {
-                                "type": "text",
-                                "text": `${owner.fields.displayName} 開的團 (${featureKey[1]})`,
-                                "weight": "bold",
-                                "margin": "sm",
-                                "flex": 0,
-                                "wrap": true
-                              }
-                            ]
-                          },
-                        ]
+                        "type": "text",
+                        "text": `${resturant.name}`,
+                        "weight": "bold",
+                        "size": "xl",
+                        "margin": "md",
+                      },
+                      {
+                        "type": "text",
+                        "text": `${owner.fields.displayName} | ${featureKey[1]}`,
+                        "margin": "xs",
+                        "color": "#aaaaaa",
+                        "wrap": true
                       },
                       {
                         "type": "text",
@@ -679,7 +717,7 @@ const LINE = {
                         "style": "primary",
                         "action": {
                           "type": "postback",
-                          "label": "確定跟團",
+                          "label": "跟團/下單",
                           "data": `joinGroupOrder=true&orderId=${order.id}&resturant=${resturant.name}`
                         }
                       },
@@ -747,6 +785,7 @@ const LINE = {
         }
       }
     }
+    console.log(intent)
 
     if (key.startsWith('menu') || intent.key === 'menu' || intent.key === 'greetings') {
       return client.replyMessage(
@@ -1089,27 +1128,56 @@ const LINE = {
     }
 
     if (intent.key.startsWith('drink_name')) {
-      const restName = intent.key.replace('drink_name_', '')
-      const resturant = await DRINK.resturantSearch(restName)
-      if (dd) console.log(resturant)
-      const drinks = (await DRINK.searchDrink(resturant.index, intent.value)).slice(0, 3).reverse()
-
       const pendingOrder = DRINK.hasPendingOrder(userId)
       let pendingMsg = undefined
+      let resturant = []
+
+      const restName = intent.key.replace('drink_name_', '')
+      resturant = await DRINK.resturantSearch(restName)
+
+      if (dd) console.log(resturant)
+      let drinks = (await DRINK.searchDrink(resturant.index, intent.value)).slice(0, 3).map(x => {
+        return {
+          ...x,
+          resturant: resturant
+        }
+      })
+
       if (pendingOrder && pendingOrder[0]) {
         const pendingOrderObject = await DRINK.getOrder(pendingOrder[0])
-        if (dd) console.log(pendingOrderObject)
-        if (dd) console.log(")))))")
-        if (pendingOrderObject) {
-          if (pendingOrderObject.fields.restaurant_index[0] !== resturant.id) {
-            pendingMsg = {
-              type: 'text', text: `找到的 飲料 跟 開團的不一樣哦! 請確定這家有 '${intent.value}'`
-            }
+        if (pendingOrderObject.fields.restaurant_index[0] !== resturant.id) {
+          resturant = await DRINK.resturantSearch(pendingOrderObject.fields.restaurant_index[0])
+          pendingMsg = {
+            type: 'text', text: `我也找到有些飲料跟團不一樣的店哦! 請確定 ${resturant.name} 有 "${witIntent._text}"～`
           }
+          drinks = [
+            ...drinks,
+            ...(await DRINK.searchDrink(resturant.index, witIntent._text)).slice(0, 2).map(x => {
+              return {
+                ...x,
+                resturant: resturant
+              }
+            })
+          ]
         }
       } else {
-        pendingMsg = { type: 'text', text: "可是你還沒開團/跟團" }
+        pendingMsg = { type: 'text', text: "可是你還沒開團/跟團\n 打入 \"myorder\" 或 飲料店名稱點開團 " }
       }
+
+      // if (pendingOrder && pendingOrder[0]) {
+      //   const pendingOrderObject = await DRINK.getOrder(pendingOrder[0])
+      //   if (dd) console.log(pendingOrderObject)
+      //   if (dd) console.log(")))))")
+      //   if (pendingOrderObject) {
+      //     if (pendingOrderObject.fields.restaurant_index[0] !== resturant.id) {
+      //       pendingMsg = {
+      //         type: 'text', text: `找到的 飲料 跟 開團的不一樣哦! 請確定這家有 '${intent.value}'`
+      //       }
+      //     }
+      //   }
+      // } else {
+      //   pendingMsg = { type: 'text', text: "可是你還沒開團/跟團" }
+      // }
       // console.log(pendingOrder)
       const drinkButtons = drinks.map((x, index) => {
         const result = []
@@ -1121,7 +1189,7 @@ const LINE = {
             "action": {
               "type": "postback",
               "label": `中 $${x.fields.medium} `,
-              "data": `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=medium&price=${x.fields.medium}&resturant=${resturant.index}`
+              "data": `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=medium&price=${x.fields.medium}&resturant=${x.resturant.index}`
             }
           }
           : null
@@ -1134,7 +1202,7 @@ const LINE = {
             "action": {
               "type": "postback",
               "label": `大 $${x.fields.large} `,
-              "data": `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=large&price=${x.fields.large}&resturant=${resturant.index}`
+              "data": `setDrinkOrder=start&orderId=${pendingOrder[0]}&drink=${x.fields.Name}&size=large&price=${x.fields.large}&resturant=${x.resturant.index}`
             }
           }
           : null
@@ -1149,7 +1217,7 @@ const LINE = {
           if (x) {
             // console.log(x)
             // console.log('000000')
-            return LINE.wrapDrink(resturant, x, drinkButtons[index])
+            return LINE.wrapDrink(x, drinkButtons[index])
           }
           return
         })
@@ -1213,14 +1281,31 @@ const LINE = {
     if ((intent.key === 'bot_feature' && intent.value === 'weather') || intent.key === 'weather' || intent.key === 'earthquake' || key === 'weather') {
       if (source.userId) {
         const weatherInfo = await weather.getWeather()
-        const weatherStr = weather.toString(weatherInfo)
-        return LINE.replyText(
+        // const weatherStr = weather.toString(weatherInfo)
+
+        return client.replyMessage(
           replyToken,
-          [
-            `天氣注意: \n${weatherStr.warning} `,
-            `最近地震: \n${weatherStr.earthquake} `
-          ]
+          {
+            "type": "flex",
+            "altText": "weather message",
+            "contents": {
+              "type": "bubble",
+              "body": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "sm",
+                "contents": weather.toLineBlock(weatherInfo)
+              }
+            }
+          }
         )
+        // return LINE.replyText(
+        //   replyToken,
+        //   [
+        //     `天氣注意: \n${weatherStr.warning} `,
+        //     `最近地震: \n${weatherStr.earthquake} `
+        //   ]
+        // )
       } else {
         return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
       }

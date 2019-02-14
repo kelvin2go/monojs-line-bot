@@ -207,6 +207,7 @@ const DRINK = {
     console.log('----')
     let result = {}
     try {
+      console.log(orderId)
       result = await cachios.patch(`${API_URL}/orders/${orderId}`, { fields }, postconfig)
       result = result.data
     } catch (err) {

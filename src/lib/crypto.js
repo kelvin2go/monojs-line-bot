@@ -17,19 +17,16 @@ const CRYPTO = {
     let result = {}
     for (let key in CRYPTO.allCrypto) {
       const elm = CRYPTO.allCrypto[key]
-      console.log(elm)
       if (elm.symbol.toLowerCase() === name.toLowerCase()) {
         result = elm;
         break;
       }
     }
-    console.log('dddd')
-    console.log(result)
-    console.log('dddddddd')
+    // console.log(result)
     return result
   },
   toString: (cryptos) => {
-    console.log(cryptos)
+    // console.log(cryptos)
     let msg = Object.keys(cryptos).map( (key) => {
       const x = cryptos[key]
       let result = `\n${x.name}: `

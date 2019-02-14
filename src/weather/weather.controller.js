@@ -8,13 +8,121 @@ const API = {
 
 const WEATHER = {
   toString: (weather) => {
-    const warning = weather.warning.map( x => {
+    const warning = weather.warning.map(x => {
       return `\n${x.time}: ${x.key}`
     })
-    const earthquake = weather.earthquake.map( x => {
+    const earthquake = weather.earthquake.map(x => {
       return `\n${x.time}: 震度 ${x.rate} 深 ${x.deep}km 位於 ${x.location}`
     })
-    return { warning, earthquake}
+    return { warning, earthquake }
+  },
+  toLineBlock: (weather) => {
+    return [
+      ...weather.warning.map(x => {
+        return {
+          "type": "box",
+          "layout": "vertical",
+          "margin": "lg",
+          "spacing": "sm",
+          "contents": [
+            {
+              "type": "box",
+              "layout": "baseline",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": `${x.time}`,
+                  "color": "#aaaaaa",
+                  "size": "sm",
+                  "flex": 2
+                },
+                {
+                  "type": "text",
+                  "text": `${x.key}`,
+                  "wrap": true,
+                  "size": "sm",
+                  "color": "#666666",
+                  "flex": 4
+                }
+              ]
+            }
+          ]
+        }
+      }),
+      {
+        "type": "box",
+        "layout": "vertical",
+        "margin": "lg",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "baseline",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "text",
+                "text": `震度`,
+                "size": "sm",
+                "weight": "bold",
+                "color": "#1a67b1",
+                "flex": 1
+              },
+              {
+                "type": "text",
+                "text": `資訊`,
+                "wrap": true,
+                "weight": "bold",
+                "color": "#1a67b1",
+                "flex": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "separator",
+        "margin": "sm"
+      },
+      ...weather.earthquake.map(x => {
+        return {
+          "type": "box",
+          "layout": "vertical",
+          "margin": "lg",
+          "spacing": "sm",
+          "contents": [
+            {
+              "type": "box",
+              "layout": "baseline",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": `${x.rate} `,
+                  "size": "sm",
+                  "weight": "bold",
+                  "color": (x.rate > 6.5 ? "#ff0000" :
+                    x.rate > 6 ? "#ff7b00" :
+                      x.rate > 5.5 ? "#ffd000" : "#00d21b"
+                  ),
+                  "flex": 1
+                },
+                {
+                  "type": "text",
+                  "text": `${x.time}\n ${x.location}\n 深度: ${x.deep}km`,
+                  "wrap": true,
+                  "size": "sm",
+                  "color": "#666666",
+                  "flex": 4
+                }
+              ]
+            }
+          ]
+        }
+      }),
+    ]
+
   },
   getWeather: async () => {
     const [warning, earthquake] = await Promise.all([
@@ -25,13 +133,15 @@ const WEATHER = {
     const patt = /"(.*?)"/gm
     const warningAry = warning.data.match(patt)
     let warnStr = [];
-    // console.log(warningAry)
-    for (let i = 0; i < warningAry.length; i++) {
-      if (i % 3 === 2 ) {
-        warnStr.push({
-          time: `${warningAry[i]}`.replace(/"/g,''),
-          key: `${warningAry[i-1]}`.replace(/"/g,'')
-        })
+    console.log(warningAry)
+    if (warningAry) {
+      for (let i = 0; i < warningAry.length; i++) {
+        if (i % 3 === 2) {
+          warnStr.push({
+            time: `${warningAry[i]}`.replace(/"/g, ''),
+            key: `${warningAry[i - 1]}`.replace(/"/g, '')
+          })
+        }
       }
     }
 
