@@ -13,6 +13,8 @@ https://www.youtube.com/watch?v=YZz3XlxyXaU
 [![Video Demo](https://img.youtube.com/vi/YZz3XlxyXaU/0.jpg)](https://www.youtube.com/watch?v=YZz3XlxyXaU)
 
 [![加 開DIN 好友](https://scdn.line-apps.com/n/line_add_friends/btn/zh-Hant.png)](https://line.me/R/ti/p/%40lnl7301g)
+(/static/din.png)
+
 Github: https://github.com/kelvin2go/monojs-line-bot
 
 
