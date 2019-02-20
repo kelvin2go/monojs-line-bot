@@ -1,16 +1,30 @@
-https://www.youtube.com/watch?v=YZz3XlxyXaU
+https://www.youtube.com/watch?v=w63PZpvq9mA
 
 有時候遇到大家訂飲料 要找 menu / 大家填單 的 小麻煩
 開發了 一個 開DIN 訂飲料 聊天機械人
-https://www.youtube.com/watch?v=YZz3XlxyXaU
 
-- mono-js(https://mono.js.org/#/?id=mono) 做 rest api server 
-- 串 LINE SDK nodejs <> bot 
-- witai(https://wit.ai/) 處理已歸類的字 / 飲料 / 飲料店
-- Airtable(https://airtable.com) 做 DB > 飲料 / 飲料店 / 單
+- 查 多家 飲料單
+- 打入飲料 歸類 某一家 飲料店（WIT.AI)
+
+- 開團 
+-- 分享團號 供大家一起下單
+-- 存大家的訂單
+-- 飲料 糖 / 冰量 選擇
+-- 刪除
+-- 分享團號 大家一起下單
+
+其他： 
+- YouTube search
+- crypto search 
+- 天氣特報 /地震報告
+
+- mono-js 做 rest api server 
+- 串 LINE SDK nodejs bot 
+- witai處理已歸類的字 / 飲料 / 飲料店
+- Airtable 做 DB 飲料 / 飲料店 / 單
+
 
 ![demo](static/din.gif)
-[![Video Demo](https://img.youtube.com/vi/YZz3XlxyXaU/0.jpg)](https://www.youtube.com/watch?v=YZz3XlxyXaU)
 
 [![加 開DIN 好友](https://scdn.line-apps.com/n/line_add_friends/btn/zh-Hant.png)](https://line.me/R/ti/p/%40lnl7301g)
 ![QRcode](./static/din.png)

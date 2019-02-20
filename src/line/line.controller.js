@@ -1266,30 +1266,34 @@ const LINE = {
           ...x,
           resturant: resturant
         }
-      })
+      }).reverse()
 
       if (pendingOrder && pendingOrder[0]) {
         const pendingOrderObject = await DRINK.getOrder(pendingOrder[0])
         if (pendingOrderObject.fields.restaurant_index[0] !== resturant.id) {
           resturant = await DRINK.resturantSearch(pendingOrderObject.fields.restaurant_index[0])
           pendingMsg = {
-            type: 'text', text: `我也找到有些飲料跟團不一樣的店哦! 請確定 ${resturant.name} 有 "${witIntent._text}"～`
+            type: 'text', text: `我也找到有些飲料跟團不一樣的店哦! 請確定 ${resturant.name} 有 '${witIntent._text}'～`
           }
           drinks = [
             ...drinks,
-            ...(await DRINK.searchDrink(resturant.index, witIntent._text)).slice(0, 2).map(x => {
+            ...(await DRINK.searchDrink(resturant.index, witIntent._text)).slice(0, 3).map(x => {
+              console.log(x)
               return {
                 ...x,
                 resturant: resturant
               }
-            })
+            }).reverse()
           ]
         }
       } else {
         pendingMsg = { type: 'text', text: "可是你還沒開團/跟團\n 打入 \"myorder\" 或 飲料店名稱點開團 " }
       }
+      if (drinks.length >= 5) {
+        drinks = drinks.slice(-4)
+      }
 
-      drinks = drinks.reverse()
+      // drinks = drinks.reverse()
 
       // if (pendingOrder && pendingOrder[0]) {
       //   const pendingOrderObject = await DRINK.getOrder(pendingOrder[0])
