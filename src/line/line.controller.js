@@ -112,6 +112,121 @@ const EventHandler = {
         )
       }
 
+      if (key === 'cancelDrinkOrder') {
+        let orderId = actionMap[key]
+        const myOrder = await DRINK.getOrder(orderId)
+        if (myOrder) {
+          const drinksOrder = JSON.parse(myOrder.fields.order)
+          //`cancelDrinkOrder=${orderId}&drinkIndex=${index}&drink=${drink.drink.drink}`
+          if (drinksOrder[actionMap.drinkIndex] && drinksOrder[actionMap.drinkIndex].user === userId) {
+            if (drinksOrder[actionMap.drinkIndex].drink.drink === actionMap.drink) {
+              drinksOrder.splice(actionMap.drinkIndex, 1)
+            }
+            console.log(drinksOrder)
+            try {
+              const result = await DRINK.updateOrder(orderId, drinksOrder)
+              console.log(result)
+              if (result) {
+                return client.replyMessage(
+                  replyToken,
+                  {
+                    "type": "text",
+                    "text": "成功更改",
+                  }
+                )
+              }
+            } catch (err) {
+              return client.replyMessage(
+                replyToken,
+                {
+                  "type": "text",
+                  "text": "好像更改出了問題！ ",
+                }
+              )
+            }
+          }
+          return client.replyMessage(
+            replyToken,
+            {
+              "type": "text",
+              "text": "好像出了問題！ ",
+            }
+          )
+
+        }
+      }
+      if (key === 'updateOrder') {
+        let orderId = actionMap[key]
+        const myOrder = await DRINK.getOrder(orderId)
+        console.log(myOrder)
+        if (myOrder) {
+          const drinksOrder = JSON.parse(myOrder.fields.order)
+          const response = drinksOrder.length > 0 ?
+            drinksOrder.map((drink, index) => {
+              if (myOrder.fields.owner === userId || drink.user === userId) {
+                return {
+                  "type": "flex",
+                  "altText": "update drink",
+                  "contents": {
+                    "type": "bubble",
+                    "body": {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "md",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": `${drink.drink.drink} (${drink.drink.size === 'large' ? '大' : drink.drink.size === 'medium' ? '中' : ''} ${drink.drink.sugar ? drink.drink.sugar : ''} ${drink.drink.ice ? drink.drink.ice : ''})`,
+                          "size": "lg",
+                          "wrap": true,
+                        },
+
+                        {
+                          "type": "text",
+                          "text": "請確認：",
+                          "wrap": true,
+                        }
+                      ]
+                    },
+                    "footer": {
+                      "type": "box",
+                      "layout": "vertical",
+                      "contents": [
+                        {
+                          "type": "box",
+                          "layout": "horizontal",
+                          "spacing": "sm",
+                          "contents": [
+                            {
+                              "type": "button",
+                              "style": "link",
+                              "height": "sm",
+                              "color": "#F6CEF5",
+                              "action": {
+                                "type": "postback",
+                                "label": `刪除`,
+                                "data": `cancelDrinkOrder=${orderId}&drinkIndex=${index}&drink=${drink.drink.drink}`
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            })
+            : [{
+              "type": "text",
+              "text": "這團沒有ORDER",
+            }]
+
+          return client.replyMessage(
+            replyToken,
+            response
+          )
+        }
+      }
       if (key === 'startDrinkOrder') {
         // const currentUser = await LINE.getProfile(event.source.userId)
         const resturant = await DRINK.resturantSearch(actionMap[key])
@@ -714,6 +829,16 @@ const LINE = {
                       },
                       {
                         "type": "button",
+                        "style": "link",
+                        "height": "sm",
+                        "action": {
+                          "type": "postback",
+                          "label": "更改訂單",
+                          "data": `updateOrder=${order.id}`
+                        }
+                      },
+                      {
+                        "type": "button",
                         "style": "primary",
                         "action": {
                           "type": "postback",
@@ -1164,6 +1289,8 @@ const LINE = {
         pendingMsg = { type: 'text', text: "可是你還沒開團/跟團\n 打入 \"myorder\" 或 飲料店名稱點開團 " }
       }
 
+      drinks = drinks.reverse()
+
       // if (pendingOrder && pendingOrder[0]) {
       //   const pendingOrderObject = await DRINK.getOrder(pendingOrder[0])
       //   if (dd) console.log(pendingOrderObject)
@@ -1245,6 +1372,53 @@ const LINE = {
         return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
       }
     }
+
+
+    if ((intent.key === 'bot_feature' && intent.value === 'resturants') || intent.key === 'resturants' || key === 'resturants') {
+      const resturants = await DRINK.getIndex()
+      const resturantsList = resturants.map((x) => {
+        return {
+          "type": "button",
+          "style": "primary",
+          "color": "#0B4C5F",
+          "action": {
+            "type": "message",
+            "text": `${x.fields.Name}`,
+            "label": `${x.fields.Name}`
+          }
+        }
+      })
+      return client.replyMessage(
+        replyToken,
+        {
+          "type": "flex",
+          "altText": "all resturant",
+          "contents": {
+            "type": "bubble",
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "現在所有的店：",
+                  "wrap": true,
+                  "weight": "bold",
+                  "size": "xl"
+                }
+              ]
+            },
+            "footer": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "sm",
+              "contents": resturantsList
+            }
+          }
+        }
+      )
+    }
     if ((intent.key === 'bot_feature' && intent.value === 'crypto') || intent.key === 'crypto' || key === 'crypto' || menu.crypto.indexOf(key) > -1) {
       if (source.userId) {
         let cryptoInfo = []
@@ -1258,19 +1432,6 @@ const LINE = {
           replyToken,
           [
             `Crypto ${featureValue || `Top10`}: \n${cryptoStr} `
-          ]
-        )
-      } else {
-        return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
-      }
-    }
-
-    if (key === 'pendingOrder') {
-      if (source.userId) {
-        DRINK.hasPendingOrder(userId)
-        return LINE.replyText(
-          replyToken,
-          [
           ]
         )
       } else {
@@ -1299,13 +1460,6 @@ const LINE = {
             }
           }
         )
-        // return LINE.replyText(
-        //   replyToken,
-        //   [
-        //     `天氣注意: \n${weatherStr.warning} `,
-        //     `最近地震: \n${weatherStr.earthquake} `
-        //   ]
-        // )
       } else {
         return LINE.replyText(replyToken, 'Bot can\'t use profile API without user ID');
       }

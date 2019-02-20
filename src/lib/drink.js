@@ -176,7 +176,7 @@ const DRINK = {
   getMyOrder: async (userId) => {
     const data = await cachios.get(`${API_URL}/orders?view=Grid%20view`, {
       ...config,
-      ttl: 5
+      ttl: 3
     })
     const myorder = data.data.records.filter(x => {
       if (x.fields.owner === userId) {
@@ -203,11 +203,22 @@ const DRINK = {
           timestamp: new Date(),
         }])
     }
-    console.log(fields)
-    console.log('----')
     let result = {}
     try {
-      console.log(orderId)
+      result = await cachios.patch(`${API_URL}/orders/${orderId}`, { fields }, postconfig)
+      result = result.data
+    } catch (err) {
+      console.log(err)
+    }
+    return result
+  },
+  updateOrder: async (orderId, drinkOrders) => {
+    if (!orderId) console.log("no orderId on sendOrder")
+    let result = {}
+    const fields = {
+      order: JSON.stringify(drinkOrders || "[]"),
+    }
+    try {
       result = await cachios.patch(`${API_URL}/orders/${orderId}`, { fields }, postconfig)
       result = result.data
     } catch (err) {

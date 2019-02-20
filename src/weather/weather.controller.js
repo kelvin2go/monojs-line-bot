@@ -18,6 +18,29 @@ const WEATHER = {
   },
   toLineBlock: (weather) => {
     return [
+      {
+        "type": "box",
+        "layout": "vertical",
+        "margin": "lg",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "baseline",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "text",
+                "text": `天氣特報`,
+                "size": "sm",
+                "weight": "bold",
+                "color": "#1a67b1",
+                "flex": 1
+              }
+            ]
+          }
+        ]
+      },
       ...weather.warning.map(x => {
         return {
           "type": "box",
@@ -35,7 +58,7 @@ const WEATHER = {
                   "text": `${x.time}`,
                   "color": "#aaaaaa",
                   "size": "sm",
-                  "flex": 2
+                  "flex": 3
                 },
                 {
                   "type": "text",
@@ -138,7 +161,7 @@ const WEATHER = {
       for (let i = 0; i < warningAry.length; i++) {
         if (i % 3 === 2) {
           warnStr.push({
-            time: `${warningAry[i]}`.replace(/"/g, ''),
+            time: `${warningAry[i]}`.replace(/"/g, '').replace('2019/', ''),
             key: `${warningAry[i - 1]}`.replace(/"/g, '')
           })
         }

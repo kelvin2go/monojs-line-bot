@@ -248,7 +248,7 @@ curl -XPUT 'https://api.wit.ai/entities/drink_name_coco?v=20160526' \
 
 
  curl -XPUT 'https://api.wit.ai/entities/drink_name_tp-tea?v=20160526' \
-  -H 'Authorization: Bearer O7VHYBDWL52XFTW4OH52YTDZP5C42D4P' \
+  -H 'Authorization: Bearer EYGRODYVZQKXUVSSV76O3537E54TGP4Z' \
   -H 'Content-Type: application/json' \
   -d '{"doc":"User-defined entity",
       "values":[{"value": "觀音拿鐵", "expressions": ["觀音拿鐵"]},
@@ -317,3 +317,72 @@ curl -XPUT 'https://api.wit.ai/entities/drink_name_coco?v=20160526' \
 {"value": "堅果觀音拿鐵", "expressions": ["堅果觀音拿鐵"]},
 {"value": "波霸堅果拿鐵", "expressions": ["波霸堅果拿鐵"]},
 {"value": "波霸堅果觀音拿鐵", "expressions": ["波霸堅果觀音拿鐵"]} ]}'
+
+
+
+ curl -XPUT 'https://api.wit.ai/entities/drink_name_50lan?v=20160526' \
+  -H 'Authorization: Bearer ' \
+  -H 'Content-Type: application/json' \
+  -d '{"doc":"User-defined entity",
+      "values":[{"value": "茉莉綠茶", "expressions": ["茉莉綠茶","抹莉綠茶"]},
+{"value": "阿薩姆紅茶", "expressions": ["阿薩姆紅茶"]},
+{"value": "四季春青茶", "expressions": ["四季春青茶","四季青"]},
+{"value": "黃金烏龍", "expressions": ["黃金烏龍"]},
+{"value": "檸檬綠", "expressions": ["檸檬綠"]},
+{"value": "梅の綠", "expressions": ["梅の綠","梅綠","梅子綠"]},
+{"value": "桔子綠", "expressions": ["桔子綠"]},
+{"value": "8冰綠", "expressions": ["8冰綠"]},
+{"value": "養樂多綠", "expressions": ["養樂多綠"]},
+{"value": "冰淇淋紅茶", "expressions": ["冰淇淋紅茶"]},
+{"value": "旺來紅", "expressions": ["旺來紅"]},
+{"value": "鮮柚綠(季節限定)", "expressions": ["鮮柚綠"]},
+{"value": "奶茶", "expressions": ["奶茶"]},
+{"value": "奶綠", "expressions": ["奶綠"]},
+{"value": "紅茶瑪奇朵", "expressions": ["紅茶瑪奇朵"]},
+{"value": "烏龍瑪奇朵", "expressions": ["烏龍瑪奇朵"]},
+{"value": "四季奶青", "expressions": ["四季奶青"]},
+{"value": "黃金烏龍奶茶", "expressions": ["黃金烏龍奶茶"]},
+{"value": "阿華田", "expressions": ["阿華田"]},
+{"value": "可可芭蕾", "expressions": ["可可芭蕾"]},
+{"value": "波霸紅","expressions": ["波霸紅"]},
+{"value": "波霸綠","expressions": ["波霸綠"]},
+{"value": "波霸青","expressions": ["波霸青"]},
+{"value": "波霸烏", "expressions": ["波霸烏"]},
+{"value": "波霸奶茶", "expressions": ["波霸奶茶"]},
+{"value": "波霸奶綠", "expressions": ["波霸奶綠"]},
+{"value": "波霸烏龍奶茶", "expressions": ["波霸烏龍奶茶"]},
+{"value": "波霸抹茶拿鐵", "expressions": ["波霸抹茶拿鐵"]},
+{"value": "珍珠紅",  "expressions": ["珍珠紅"]},
+{"value": "珍珠綠", "expressions": ["珍珠綠"]},
+{"value": "珍珠青", "expressions": ["珍珠青"]},
+{"value": "珍珠烏", "expressions": ["珍珠烏"]},
+{"value": "珍珠奶茶", "expressions": ["珍珠奶茶"]},
+{"value": "珍珠奶綠", "expressions": ["珍珠奶綠"]},
+{"value": "椰果奶茶", "expressions": ["椰果奶茶"]},
+{"value": "布丁奶茶", "expressions": ["布丁奶茶"]},
+{"value": "布丁奶綠", "expressions": ["布丁奶綠"]},
+{"value": "布丁紅", "expressions": ["布丁紅"]},
+{"value": "布丁綠", "expressions": ["布丁綠"]},
+{"value": "布丁青", "expressions": ["布丁青"]},
+{"value": "布丁烏", "expressions": ["布丁烏"]},
+{"value": "檸檬汁", "expressions": ["檸檬汁"]},
+{"value": "金桔檸檬", "expressions": ["金桔檸檬"]},
+{"value": "檸檬梅汁", "expressions": ["檸檬梅汁"]},
+{"value": "檸檬養樂多", "expressions": ["檸檬養樂多"]},
+{"value": "8冰茶", "expressions": ["8冰茶"]},
+{"value": "鮮柚汁(季節限定)", "expressions": ["鮮柚汁"]},
+{"value": "葡萄柚多多(季節限定)", "expressions": ["葡萄柚多多"]},
+{"value": "紅茶拿鐵", "expressions": ["紅茶拿鐵"]},
+{"value": "綠茶拿鐵", "expressions": ["綠茶拿鐵"]},
+{"value": "黃金烏龍拿鐵", "expressions": ["黃金烏龍拿鐵"]},
+{"value": "抹茶拿鐵", "expressions": ["抹茶拿鐵","抹茶"]},
+{"value": "阿華田拿鐵", "expressions": ["阿華田拿鐵"]},
+{"value": "可可芭蕾拿鐵", "expressions": ["可可芭蕾拿鐵"]},
+{"value": "波霸鮮奶", "expressions": ["波霸鮮奶"]},
+{"value": "珍珠鮮奶", "expressions": ["珍珠鮮奶"]},
+{"value": "檸檬紅茶", "expressions": ["檸檬紅茶"]},
+{"value": "檸檬梅汁綠", "expressions": ["檸檬梅汁綠"]},
+{"value": "四季春+珍波椰", "expressions": ["四季春","珍波椰","四季春+珍波椰","四季春珍波椰"]},
+{"value": "波霸奶綠", "expressions": ["波霸奶綠"]},
+{"value": "烏龍瑪奇朵", "expressions": ["烏龍瑪奇朵"]},
+{"value": "混珠黃金烏龍", "expressions": ["混珠黃金烏龍"]} ]}'
