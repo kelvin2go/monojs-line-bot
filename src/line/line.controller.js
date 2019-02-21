@@ -160,7 +160,7 @@ const EventHandler = {
         const myOrder = await DRINK.getOrder(orderId)
         console.log(myOrder)
         if (myOrder) {
-          const drinksOrder = JSON.parse(myOrder.fields.order)
+          const drinksOrder = JSON.parse(myOrder.fields.order || [])
           const response = drinksOrder.length > 0 ?
             drinksOrder.map((drink, index) => {
               if (myOrder.fields.owner === userId || drink.user === userId) {
@@ -1278,7 +1278,6 @@ const LINE = {
           drinks = [
             ...drinks,
             ...(await DRINK.searchDrink(resturant.index, witIntent._text)).slice(0, 3).map(x => {
-              console.log(x)
               return {
                 ...x,
                 resturant: resturant
