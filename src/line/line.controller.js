@@ -160,7 +160,7 @@ const EventHandler = {
         const myOrder = await DRINK.getOrder(orderId)
         console.log(myOrder)
         if (myOrder) {
-          const drinksOrder = JSON.parse(myOrder.fields.order || [])
+          const drinksOrder = JSON.parse(myOrder.fields.hasOwnProperty('order') ? myOrder.fields.order || '[]' : '[]')
           const response = drinksOrder.length > 0 ?
             drinksOrder.map((drink, index) => {
               if (myOrder.fields.owner === userId || drink.user === userId) {
