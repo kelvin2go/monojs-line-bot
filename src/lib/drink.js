@@ -166,12 +166,76 @@ const DRINK = {
     // console.log(result)
     return result
   },
+  drinkLineBlock: (drink, drinkButtons) => {
+    return drink ? {
+      "type": "flex",
+      "altText": "Confirm Drink",
+      "contents": {
+        "type": "bubble",
+        "body": {
+          "type": "box",
+          "layout": "vertical",
+          "spacing": "md",
+          "contents": [
+            {
+              "type": "text",
+              "text": `${drink.resturant.name} ${drink.fields.Name}`,
+              "wrap": true,
+              "size": "lg"
+            },
+            {
+              "type": "text",
+              "text": "請確認：",
+              "wrap": true,
+            }
+          ]
+        },
+        "footer": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "box",
+              "layout": "horizontal",
+              "spacing": "sm",
+              "contents": [...drinkButtons]
+            }
+          ]
+        }
+      }
+    } : null
+  },
   getOrder: async (orderId) => {
     const data = await cachios.get(`${API_URL}/orders/${orderId}`, {
       ...config,
-      ttl: 5
+      ttl: 3
     })
     return data.data
+  },
+  orderInfoLineBlock: (orders) => {
+    return orders.map(x => {
+      return {
+        "type": "box",
+        "layout": "baseline",
+        "contents": [
+          {
+            "type": "text",
+            "text": `${x.username} ${x.drink.drink}(${x.drink.size === 'large' ? '大' : x.drink.size === 'medium' ? '中' : ''} ${x.drink.sugar ? x.drink.sugar : ''} ${x.drink.ice ? x.drink.ice : ''})`,
+            "size": "sm",
+            "wrap": true,
+            "color": "#555555",
+            "flex": 0
+          },
+          {
+            "type": "text",
+            "text": `$${x.drink.price}`,
+            "size": "sm",
+            "color": "#111111",
+            "align": "end"
+          }
+        ]
+      }
+    })
   },
   getMyOrder: async (userId) => {
     const data = await cachios.get(`${API_URL}/orders?view=Grid%20view`, {

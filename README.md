@@ -31,6 +31,8 @@ https://www.youtube.com/watch?v=w63PZpvq9mA
 
 Github: https://github.com/kelvin2go/monojs-line-bot
 
+TODO: 
+https://trello.com/b/B9hnek8F/%E9%96%8Bdin-line-bot
 
 # monojs-line-bot
 

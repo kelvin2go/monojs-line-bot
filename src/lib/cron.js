@@ -1,11 +1,11 @@
 'use-strict';
-const WEATHER = require('../weather/weather.controller') 
-const LINE = require('../line/line.controller')
+const WEATHER = require('../weather/weather.controller')
+// const LINE = require('../line/line.controller')
 // const FIREBASE = require('./firebase')
 
 let cache = {
   weather: null
-} 
+}
 let timer = {}
 
 const CRON = {
@@ -13,14 +13,14 @@ const CRON = {
     timer.weather = setInterval(CRON.weather, 4000)
   },
   stop: () => {
-    Object.keys(timer).map( (key) => {
+    Object.keys(timer).map((key) => {
       clearInterval(timer[key])
       console.log(`Stop: ${key}`)
     })
   },
   weather: async () => {
     const weatherInfo = await WEATHER.getWeather()
-    if ( JSON.stringify(cache.weather) !== JSON.stringify(weatherInfo)) {
+    if (JSON.stringify(cache.weather) !== JSON.stringify(weatherInfo)) {
       cache.weather = weatherInfo
       // start sending push weather message 
       // const allusers = await FIREBASE.getAllUser()
@@ -35,7 +35,7 @@ const CRON = {
       // ])
     }
   },
-  
+
 }
 
 module.exports = CRON
