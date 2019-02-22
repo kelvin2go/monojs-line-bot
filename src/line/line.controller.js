@@ -16,8 +16,6 @@ const config = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
   channelSecret: process.env.CHANNEL_SECRET,
 };
-// console.log(config)
-// console.log(process.env)
 // base URL for webhook server
 const baseURL = process.env.BASE_URL
 // create LINE SDK client
@@ -41,13 +39,13 @@ const EventHandler = {
     if (key) {
       if (dd) console.log(key, actionMap[key])
 
-      LINEAction.replyToken = replyToken
       console.log(`calling ${key}`)
       await LINEAction.postback[key]({
+        replyToken,
         key,
         actionMap,
         userId,
-        event
+        event,
       })
 
     }
@@ -106,7 +104,6 @@ const LINE = {
   },
 
   handleText: async (message, replyToken, source) => {
-    const buttonsImageURL = `${baseURL}/static/buttons/1040.jpg`;
     // const curProfile = await client.getProfile(source.userId)
     const trimText = message.text.trim()
     const featureKey = trimText.split(' ')
@@ -165,10 +162,10 @@ const LINE = {
     }
     console.log(intent)
 
-    LINEAction.replyToken = replyToken
     if (LINEAction.textHandler.hasOwnProperty(intent.key)) {
       console.log(`calling ${intent.key}`)
       await LINEAction.textHandler[intent.key]({
+        replyToken,
         featureKey,
         userId,
         intent,
@@ -178,6 +175,7 @@ const LINE = {
     if (LINEAction.textHandler.hasOwnProperty(key)) {
       console.log(`calling ${key}`)
       await LINEAction.textHandler[key]({
+        replyToken,
         featureKey,
         userId,
         intent,
@@ -186,10 +184,11 @@ const LINE = {
 
     if (intent.hasOwnProperty('key') && intent.key.startsWith('drink_name')) {
       await LINEAction.textHandler['drink_name']({
+        replyToken,
         featureKey,
         userId,
         intent,
-        witIntent
+        witIntent,
       })
     }
 

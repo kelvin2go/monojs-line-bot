@@ -1,3 +1,4 @@
+VIDEO DEMO:
 https://www.youtube.com/watch?v=w63PZpvq9mA
 
 有時候遇到大家訂飲料 要找 menu / 大家填單 的 小麻煩

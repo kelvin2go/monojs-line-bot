@@ -23,18 +23,20 @@ const config = {
 const client = new line.Client(config)
 
 const postback = {
-  DATE: ({ key, event }) => {
+  DATE: ({ replyToken, key, event, }) => {
     const textdata = `${key} (${JSON.stringify(event.postback.params)})`
-    return LINEAction.reply(
+    return client.replyMessage(
+      replyToken,
       {
         type: 'text',
         "text": `Got postback: ${textdata}`
       }
     )
   },
-  drinkMenu: async ({ key, actionMap }) => {
+  drinkMenu: async ({ replyToken, key, actionMap }) => {
     const resturant = await DRINK.resturantSearch(actionMap[key])
-    return LINEAction.reply(
+    return client.replyMessage(
+      replyToken,
       {
         type: 'image',
         originalContentUrl: resturant.image.menu.url,
@@ -42,7 +44,7 @@ const postback = {
       }
     )
   },
-  allResturant: async () => {
+  allResturant: async ({ replyToken }) => {
     const resturants = await DRINK.getIndex()
     const resturantsList = resturants.map((x) => {
       return {
@@ -56,7 +58,8 @@ const postback = {
         }
       }
     })
-    return LINEAction.reply(
+    return client.replyMessage(
+      replyToken,
       {
         "type": "flex",
         "altText": "all resturant",
@@ -86,7 +89,7 @@ const postback = {
       }
     )
   },
-  cancelDrinkOrder: async ({ key, actionMap, userId }) => {
+  cancelDrinkOrder: async ({ replyToken, key, actionMap, userId }) => {
     let orderId = actionMap[key]
     const myOrder = await DRINK.getOrder(orderId)
     if (myOrder) {
@@ -101,7 +104,8 @@ const postback = {
           const result = await DRINK.updateOrder(orderId, drinksOrder)
           console.log(result)
           if (result) {
-            return LINEAction.reply(
+            return client.replyMessage(
+              replyToken,
               {
                 "type": "text",
                 "text": "成功更改",
@@ -109,7 +113,8 @@ const postback = {
             )
           }
         } catch (err) {
-          return LINEAction.reply(
+          return client.replyMessage(
+            replyToken,
             {
               "type": "text",
               "text": "好像更改出了問題！ ",
@@ -117,14 +122,15 @@ const postback = {
           )
         }
       }
-      return LINEAction.reply({
-        "type": "text",
-        "text": "好像出了問題！ ",
-      })
-
+      return client.replyMessage(
+        replyToken,
+        {
+          "type": "text",
+          "text": "好像出了問題！ ",
+        })
     }
   },
-  updateOrder: async ({ key, actionMap, userId }) => {
+  updateOrder: async ({ replyToken, key, actionMap, userId }) => {
     let orderId = actionMap[key]
     const myOrder = await DRINK.getOrder(orderId)
     console.log(myOrder)
@@ -190,19 +196,20 @@ const postback = {
           "text": "這團沒有ORDER",
         }]
 
-      return LINEAction.reply(
+      return client.replyMessage(
+        replyToken,
         response
       )
     }
   },
 
-  startDrinkOrder: async ({ key, actionMap, userId }) => {
+  startDrinkOrder: async ({ replyToken, key, actionMap, userId }) => {
     const resturant = await DRINK.resturantSearch(actionMap[key])
     const order = await DRINK.createOwnerOrder(userId, resturant)
 
     if (order) {
       DRINK.startPendingOrder(userId, order.id)
-      return LINEAction.reply(
+      return client.replyMessage(replyToken,
         [
           {
             "type": "text",
@@ -224,7 +231,7 @@ const postback = {
       )
     }
   },
-  joinGroupOrder: async ({ actionMap, userId }) => {
+  joinGroupOrder: async ({ replyToken, actionMap, userId }) => {
     // const currentUser = await LINE.getProfile(event.source.userId)
     const orderId = actionMap['orderId']
     if (orderId && orderId !== 'undefined') {
@@ -244,7 +251,8 @@ const postback = {
         }
       }
 
-      return LINEAction.reply(
+      return client.replyMessage(
+        replyToken,
         [
           {
             "type": "text",
@@ -258,7 +266,7 @@ const postback = {
       )
     }
   },
-  setDrinkOrder: async ({ key, actionMap, userId }) => {
+  setDrinkOrder: async ({ replyToken, key, actionMap, userId }) => {
     console.log("start sending order2")
     const orderId = actionMap.orderId
     if (orderId && orderId !== 'undefined') {
@@ -279,7 +287,8 @@ const postback = {
         '熱': "#ff0000"
       }
       if (actionMap[key] === 'start') {
-        return LINEAction.reply(
+        return client.replyMessage(
+          replyToken,
           [{
             "type": "flex",
             "altText": "Confirm Drink option - sugar",
@@ -335,7 +344,8 @@ const postback = {
       }
 
       if (actionMap[key] === 'sugarOption') {
-        return LINEAction.reply(
+        return client.replyMessage(
+          replyToken,
           [{
             "type": "flex",
             "altText": "Confirm Drink option",
@@ -420,7 +430,8 @@ const postback = {
         })
 
         DRINK.clearPendingOrder(userId)
-        return LINEAction.reply(
+        return client.replyMessage(
+          replyToken,
           [
             {
               "type": "text",
@@ -462,7 +473,8 @@ const postback = {
       }
     } else { // ask for 開團
       const resturant = await DRINK.resturantSearch(actionMap['resturant'])
-      return LINEAction.reply(
+      return client.replyMessage(
+        replyToken,
         [
           {
             "type": "flex",
@@ -542,7 +554,7 @@ const postback = {
 }
 
 const textHandler = {
-  track_order: async ({ featureKey, userId }) => {
+  track_order: async ({ replyToken, featureKey, userId }) => {
     try {
       const order = await DRINK.getOrder(featureKey[1])
       if (order) {
@@ -564,7 +576,8 @@ const textHandler = {
             "text": `無人下單`,
             "size": "sm"
           }
-        return LINEAction.reply(
+        return client.replyMessage(
+          replyToken,
           {
             "type": "flex",
             "altText": "找到團",
@@ -669,7 +682,8 @@ const textHandler = {
       }
     } catch (err) {
       console.log(err)
-      return LINEAction.reply(
+      return client.replyMessage(
+        replyToken,
         {
           type: 'text',
           text: `找不到 團號 ${featureKey[1]}`
@@ -677,7 +691,7 @@ const textHandler = {
       )
     }
   },
-  my_order: async ({ userId }) => {
+  my_order: async ({ replyToken, userId }) => {
     const myOrders = await DRINK.getMyOrder(userId)
     const response = myOrders.length > 0 ?
       myOrders.map(order => {
@@ -687,7 +701,7 @@ const textHandler = {
           "height": "sm",
           "action": {
             "type": "message",
-            "label": `${new Date(order.fields.created_time).daytime()} ${order.id}`,
+            "label": `${new Date(order.fields.created_time).daytime()}\t${order.id}`,
             "text": `團號 ${order.id}`
           }
         }
@@ -696,7 +710,8 @@ const textHandler = {
         "type": "text",
         "text": "你還沒有開團",
       }]
-    return LINEAction.reply(
+    return client.replyMessage(
+      replyToken,
       {
         "type": "flex",
         "altText": `我的團`,
@@ -711,21 +726,23 @@ const textHandler = {
       }
     )
   },
-  confirm_new_word: () => {
-    return LINEAction.reply(
+  confirm_new_word: ({ replyToken }) => {
+    return client.replyMessage(
+      replyToken,
       {
         type: 'text',
         text: `好的，謝謝你教我新字。 \n過一陣子 ～～～ 我會記起來～`
       }
     )
   },
-  start_drink_order: async ({ intent }) => {
+  start_drink_order: async ({ replyToken, intent }) => {
     console.log('Starting order')
     const drinkResutrant = await DRINK.resturantSearch(intent.value)
     // console.log(drinkResutrant)
     const pic = drinkResutrant[0].fields.menu[0]
     // console.log(pic)
-    return LINEAction.reply(
+    return client.replyMessage(
+      replyToken,
       {
         type: 'image',
         originalContentUrl: pic.url,
@@ -733,10 +750,11 @@ const textHandler = {
       }
     )
   },
-  drink_resturant: async ({ intent }) => {
+  drink_resturant: async ({ replyToken, intent }) => {
     console.log('sending resutant image')
     const resturant = await DRINK.resturantSearch(intent.value)
-    return LINEAction.reply(
+    return client.replyMessage(
+      replyToken,
       {
         "type": "flex",
         "altText": `${resturant.name} info card`,
@@ -805,8 +823,9 @@ const textHandler = {
       }
     )
   },
-  menu: () => {
-    return LINEAction.reply(
+  menu: ({ replyToken }) => {
+    return client.replyMessage(
+      replyToken,
       {
         "type": "flex",
         "altText": "menu",
@@ -1008,7 +1027,7 @@ const textHandler = {
     )
   },
 
-  drink_name: async ({ intent, userId, witIntent }) => {
+  drink_name: async ({ replyToken, intent, userId, witIntent }) => {
     const pendingOrder = DRINK.hasPendingOrder(userId)
     let pendingMsg = undefined
     let resturant = []
@@ -1111,18 +1130,11 @@ const textHandler = {
     if (pendingMsg) {
       messages.push(pendingMsg)
     }
-    return LINEAction.reply(messages)
+    return client.replyMessage(replyToken, messages)
   }
 }
 
 const LINEAction = {
-  replyToken: '',
-  reply: (messages) => {
-    return client.replyMessage(
-      LINEAction.replyToken,
-      messages
-    )
-  },
   postback,
   textHandler
 }
