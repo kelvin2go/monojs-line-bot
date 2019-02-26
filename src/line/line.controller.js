@@ -136,27 +136,27 @@ const LINE = {
           }
         } else if (menuKeywords.indexOf(key) === -1) {
           console.log(`Too low confidence ${firstElement.confidence}`)
-          return client.replyMessage(
-            replyToken,
-            [
-              {
-                "type": "text",
-                "text": `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
-              },
-              {
-                type: 'template',
-                altText: 'correcting words',
-                template: {
-                  type: 'confirm',
-                  text: `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
-                  actions: [
-                    { label: 'Yes', type: 'message', text: `${firstElement.value}` },
-                    { label: 'No', type: 'message', text: `否! ${firstElement.value}` },
-                  ],
-                },
-              }
-            ]
-          )
+          // return client.replyMessage(
+          //   replyToken,
+          //   [
+          //     {
+          //       "type": "text",
+          //       "text": `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
+          //     },
+          //     {
+          //       type: 'template',
+          //       altText: 'correcting words',
+          //       template: {
+          //         type: 'confirm',
+          //         text: `你說的 '${trimText}' 是跟 '${firstElement.value}' 相關的嗎？ (${(firstElement.confidence * 100).toFixed(2)}%)`,
+          //         actions: [
+          //           { label: 'Yes', type: 'message', text: `${firstElement.value}` },
+          //           { label: 'No', type: 'message', text: `否! ${firstElement.value}` },
+          //         ],
+          //       },
+          //     }
+          //   ]
+          // )
         }
       }
     }
@@ -412,12 +412,12 @@ const LINE = {
       }
     }
 
-    switch (featureKey[0]) {
-      default: {
-        console.log(`Echo message to ${replyToken}: ${message.text} `);
-        return LINE.replyText(replyToken, message.text);
-      }
-    }
+    // switch (featureKey[0]) {
+    //   default: {
+    //     console.log(`Echo message to ${replyToken}: ${message.text} `);
+    //     return LINE.replyText(replyToken, message.text);
+    //   }
+    // }
   },
 
   handleEvent: async (event) => {

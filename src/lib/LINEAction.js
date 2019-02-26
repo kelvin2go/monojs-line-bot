@@ -231,7 +231,7 @@ const postback = {
       )
     }
   },
-  joinGroupOrder: async ({ replyToken, actionMap, userId }) => {
+  joinGroupOrder: async ({ replyToken, actionMap, userId, event }) => {
     // const currentUser = await LINE.getProfile(event.source.userId)
     const orderId = actionMap['orderId']
     if (orderId && orderId !== 'undefined') {
@@ -250,20 +250,38 @@ const postback = {
           created = new Date(order.fields.created_time).yyyymmdd()
         }
       }
+      console.log(event.source)
+      if (event.source.type === 'group') {
+        return client.pushMessage(
+          event.source.userId,
+          [
+            {
+              "type": "text",
+              "text": `你在跟 ${owner ? owner.fields.displayName : ''} ${created ? created : ''} ${actionMap['resturant']} 團`
+            },
+            {
+              "type": "text",
+              "text": "請問你要喝什麼? "
+            }
+          ]
+        )
+      } else {
+        return client.replyMessage(
+          replyToken,
+          [
+            {
+              "type": "text",
+              "text": `你在跟 ${owner ? owner.fields.displayName : ''} ${created ? created : ''} ${actionMap['resturant']} 團`
+            },
+            {
+              "type": "text",
+              "text": "請問你要喝什麼? "
+            }
+          ]
+        )
+      }
 
-      return client.replyMessage(
-        replyToken,
-        [
-          {
-            "type": "text",
-            "text": `你在跟 ${owner ? owner.fields.displayName : ''} ${created ? created : ''} ${actionMap['resturant']} 團`
-          },
-          {
-            "type": "text",
-            "text": "請問你要喝什麼? "
-          }
-        ]
-      )
+
     }
   },
   setDrinkOrder: async ({ replyToken, key, actionMap, userId }) => {
