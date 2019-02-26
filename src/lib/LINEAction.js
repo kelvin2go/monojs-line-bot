@@ -203,32 +203,53 @@ const postback = {
     }
   },
 
-  startDrinkOrder: async ({ replyToken, key, actionMap, userId }) => {
+  startDrinkOrder: async ({ replyToken, key, actionMap, userId, event }) => {
     const resturant = await DRINK.resturantSearch(actionMap[key])
     const order = await DRINK.createOwnerOrder(userId, resturant)
 
     if (order) {
       DRINK.startPendingOrder(userId, order.id)
-      return client.replyMessage(replyToken,
-        [
-          {
-            "type": "text",
-            "text": `你的 ${resturant.name} 團已開!`
-          },
-          {
-            "type": "text",
-            "text": `邀人方法:\n1。只要他跟'開DIN' 打入 "跟團號 ${order.id}"\n2。他選完飲料、就會出到同一張單了`
-          },
-          {
-            "type": "text",
-            "text": `跟團號 ${order.id}`
-          },
-          {
-            "type": "text",
-            "text": "請問你要喝什麼? "
+      const messages = [
+        {
+          "type": "text",
+          "text": `你的 ${resturant.name} 團已開!`
+        },
+        {
+          "type": "text",
+          "text": `邀人方法:\n1。只要他跟'開DIN' 打入 "跟團號 ${order.id}"\n2。他選完飲料、就會出到同一張單了`
+        },
+        {
+          "type": "flex",
+          "altText": "group order success",
+          "contents": {
+            "type": "bubble",
+            "footer": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "button",
+                  "style": "primary",
+                  "action": {
+                    "type": "message",
+                    "label": `團號 ${order.id}`,
+                    "text": `團號 ${order.id}`
+                  }
+                }
+              ]
+            }
           }
-        ]
-      )
+        }
+      ]
+
+      if (event.source.type === 'user') {
+        messages.push({
+          "type": "text",
+          "text": "請問你要喝什麼? "
+        })
+      }
+      return client.replyMessage(replyToken, messages)
     }
   },
   joinGroupOrder: async ({ replyToken, actionMap, userId, event }) => {
